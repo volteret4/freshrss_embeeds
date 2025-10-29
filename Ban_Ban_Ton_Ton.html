@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ban Ban Ton Ton - Embeds</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+        }
+
+        .embeds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .embeds-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .embed-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .embed-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        .embed-info {
+            margin-bottom: 15px;
+        }
+
+        .embed-type {
+            display: inline-block;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .embed-info h3 {
+            font-size: 1.1em;
+            color: #2d3748;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .embed-info .meta {
+            font-size: 0.9em;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .embed-info a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .embed-info a:hover {
+            text-decoration: underline;
+        }
+
+        .embed-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .embed-container iframe {
+            max-width: 100%;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .page-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            background: #764ba2;
+            font-weight: bold;
+        }
+
+        .page-info {
+            padding: 10px 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #718096;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ban Ban Ton Ton</h1>
+            <div class="stats">
+                Total: 115 embeds | Páginas: 15
+            </div>
+        </header>
+
+        <div id="pagination-top" class="pagination"></div>
+        <div id="content"></div>
+        <div id="pagination-bottom" class="pagination"></div>
+
+        <footer>
+            <p>Generado desde FreshRSS</p>
+        </footer>
+    </div>
+
+    <script>
+        // Datos incrustados directamente en el HTML
+        const allPagesData = {
+  "1": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/91f_WYccFQ8",
+      "title": "The EFG London Jazz Festival Previewed",
+      "article_link": "https://thequietus.com/news/the-efg-london-jazz-festival-previewed/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-29 07:00"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5Tek9h3a5wQ",
+      "title": "The EFG London Jazz Festival Previewed",
+      "article_link": "https://thequietus.com/news/the-efg-london-jazz-festival-previewed/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-29 07:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://seefeel.bandcamp.com/album/pure-impure-expanded-eps-edition",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1212060845/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Ax_lDKSrhuE",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/KkIcFP8WnDM",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/nsxaMB0pRCM",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/NNKA7i4i9GA",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/mHyZwUgyo_M",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    }
+  ],
+  "2": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/pB2KJQxV7yM",
+      "title": "Seefeel / Pure Impure / Beggars Arkive – By Dr Rob",
+      "article_link": "https://banbantonton.com/2025/10/29/seefeel-pure-impure-beggars-arkive-by-dr-rob/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:02"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://seefeel.bandcamp.com/album/pure-impure-expanded-eps-edition",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1212060845/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Seelfeel / Pure, Impure / Beggars Arkive – By John Matthews",
+      "article_link": "https://banbantonton.com/2025/10/29/seelfeel-pure-impure-beggars-arkive/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/cXP7ISJt_wo",
+      "title": "Seelfeel / Pure, Impure / Beggars Arkive – By John Matthews",
+      "article_link": "https://banbantonton.com/2025/10/29/seelfeel-pure-impure-beggars-arkive/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/pB2KJQxV7yM",
+      "title": "Seelfeel / Pure, Impure / Beggars Arkive – By John Matthews",
+      "article_link": "https://banbantonton.com/2025/10/29/seelfeel-pure-impure-beggars-arkive/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/S_x7X5Re3Kk",
+      "title": "Seelfeel / Pure, Impure / Beggars Arkive – By John Matthews",
+      "article_link": "https://banbantonton.com/2025/10/29/seelfeel-pure-impure-beggars-arkive/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-29 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/zlL95ZAlydI",
+      "title": "All this and Ian McShane too: Grace Jones’ Slave To The Rhythm at 40",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/grace-jones-slave-to-the-rhythm-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-28 11:33"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/HB4gBtMpUIs",
+      "title": "All this and Ian McShane too: Grace Jones’ Slave To The Rhythm at 40",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/grace-jones-slave-to-the-rhythm-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-28 11:33"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/kIicwZrkEhY",
+      "title": "All this and Ian McShane too: Grace Jones’ Slave To The Rhythm at 40",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/grace-jones-slave-to-the-rhythm-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-28 11:33"
+    }
+  ],
+  "3": [
+    {
+      "type": "bandcamp",
+      "url": "https://runningbackrecords.bandcamp.com/album/r-zone-ep",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2670992114/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://mikeparadinas.bandcamp.com/album/1979",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3863463080/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://nayabeat.bandcamp.com/album/punjabi-disco",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3836386083/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://asatate-techsupport.bandcamp.com/album/replica",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2162189491/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/mgjHsQuHsHI",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5W9rPHBsSq0",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/aztqVlw0sPE",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/U9M99Ht2keA",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    }
+  ],
+  "4": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/IpeRShWMdYM",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5k77elrSO2A",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/j7vxHOCeiQ4",
+      "title": "Looking For The Balearic Beat / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/28/looking-for-the-balearic-beat-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-28 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/SGJFWirQ3ks",
+      "title": "Setting the Stage for Alt-Rock's Early '90s Uprising",
+      "article_link": "https://www.allmusic.com/blog/post/setting-the-stage-for-alt-rocks-early-90s-uprising",
+      "author": "Greg Prato",
+      "feed": "AllMusic Blog",
+      "date": "2025-10-28 01:00"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/VzoaUwb07-Q",
+      "title": "Setting the Stage for Alt-Rock's Early '90s Uprising",
+      "article_link": "https://www.allmusic.com/blog/post/setting-the-stage-for-alt-rocks-early-90s-uprising",
+      "author": "Greg Prato",
+      "feed": "AllMusic Blog",
+      "date": "2025-10-28 01:00"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/RZI-FTcFtn8",
+      "title": "Setting the Stage for Alt-Rock's Early '90s Uprising",
+      "article_link": "https://www.allmusic.com/blog/post/setting-the-stage-for-alt-rocks-early-90s-uprising",
+      "author": "Greg Prato",
+      "feed": "AllMusic Blog",
+      "date": "2025-10-28 01:00"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/brOPaxbz1CU",
+      "title": "Setting the Stage for Alt-Rock's Early '90s Uprising",
+      "article_link": "https://www.allmusic.com/blog/post/setting-the-stage-for-alt-rocks-early-90s-uprising",
+      "author": "Greg Prato",
+      "feed": "AllMusic Blog",
+      "date": "2025-10-28 01:00"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/1kAIMlISHhU",
+      "title": "Setting the Stage for Alt-Rock's Early '90s Uprising",
+      "article_link": "https://www.allmusic.com/blog/post/setting-the-stage-for-alt-rocks-early-90s-uprising",
+      "author": "Greg Prato",
+      "feed": "AllMusic Blog",
+      "date": "2025-10-28 01:00"
+    }
+  ],
+  "5": [
+    {
+      "type": "bandcamp",
+      "url": "https://calibansounds.bandcamp.com/album/live-at-the-horse-hospital",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=201240317/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Straight Hedge! Noel Gardner Reviews Punk ＆ Hardcore for October",
+      "article_link": "https://thequietus.com/quietus-reviews/punk/punk-hardcore-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-27 11:26"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://traidorapunx.bandcamp.com/album/un-cuerpo-trans-lleno-de-odio",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2145866152/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Straight Hedge! Noel Gardner Reviews Punk ＆ Hardcore for October",
+      "article_link": "https://thequietus.com/quietus-reviews/punk/punk-hardcore-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-27 11:26"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://dtaktochrapunkrecords.bandcamp.com/album/non-stop-erotic-noise-cabaret",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1331957083/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Straight Hedge! Noel Gardner Reviews Punk ＆ Hardcore for October",
+      "article_link": "https://thequietus.com/quietus-reviews/punk/punk-hardcore-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-27 11:26"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://traidorapunx.bandcamp.com/album/una-mujer-trans-sin-pa-s",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3855319770/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Straight Hedge! Noel Gardner Reviews Punk ＆ Hardcore for October",
+      "article_link": "https://thequietus.com/quietus-reviews/punk/punk-hardcore-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2025-10-27 11:26"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://mrbongo.bandcamp.com/album/garoto-do-pife-homenagem-a-ludugero",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3320016519/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://mikeparadinas.bandcamp.com/track/escorial",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/track=2840013715/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://hobbesmusicon.bandcamp.com/album/flying-saucers-hm034ep-house-balearic-cosmic",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3924974086/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://lukeschneider.bandcamp.com/album/a-companion-for-the-spaces-between-dreams",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3859081547/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    }
+  ],
+  "6": [
+    {
+      "type": "bandcamp",
+      "url": "https://birikliche.bandcamp.com/track/testing-the-twin",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/track=947904668/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/yYg5AC9e5rg",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/NLRiNVTmyWw",
+      "title": "Chocolate Milk ＆ Brandy / October 2025",
+      "article_link": "https://banbantonton.com/2025/10/27/chocolate-milk-brandy-october-2025/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2025-10-27 01:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://sahkorecordings.bandcamp.com/album/sysivalo",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4150124748/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Ø (Mika Vainio) * Franz Kirmann",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/vaino-kirmann/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-25 10:01"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://franzkirmann.bandcamp.com/album/heures-indues",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4137586479/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Ø (Mika Vainio) * Franz Kirmann",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/vaino-kirmann/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-25 10:01"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/-oVami1uT7Q",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/d0Ctf9Ho_CI",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/e26zZ83Oh6Y",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    }
+  ],
+  "7": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/HPPzQgTaLbo",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/e1mHyj3lubQ",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/tebTvzehp2g",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/DFZobgLF5Vc",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/eWc2m0FH_sc",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5Y4v5mwC5UU",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/OTdkHV9YsIk",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/kF93FqBqIeE",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    }
+  ],
+  "8": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/bTWXjcErGGk",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Vyx34kgHGng",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/OmC6KIwjgFY",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/PGHgpVU3UuU",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/6PTTgbci4Kg",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/6oXvEbtx4L4",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/9RdHXui_SxA",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/r94JH8PaU0c",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    }
+  ],
+  "9": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/9RsZifvSVSI",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/J5oZ80Daduc",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/YdMn8xzCOS0",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/RAena9F9oSE",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/1P7mPNvwMYM",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/rci2crm1R5s",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/cneBpjwfxhg",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/A78b9IgI3EU",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    }
+  ],
+  "10": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/mdof2gMgRYY",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/y9IMOUVJMVs",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/KvB4Bm_3brU",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/tPZODCWrUN8",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/h_tgnG7t0kA",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/1ZRtBJRQ80w",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/6r1-HTiwGiY",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/OeLx_CGm6qo",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    }
+  ],
+  "11": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/ccb2xnqfgCU",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/WWFo-JoYSLo",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/8mL3L9hN2l4",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/rv4wf7bzfFE",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/S2uMYyAKFvU",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/spx2xvBDYvI",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/uQauaVbPEAA",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/EStJv_wsrdg",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    }
+  ],
+  "12": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/lxPVWSFPkwA",
+      "title": "notes.billmill.org",
+      "article_link": "https://notes.billmill.org/music/youtube_concerts.html",
+      "author": "wallabag",
+      "feed": "wallabag — unread feed",
+      "date": "2025-10-22 20:52"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://instantclassic.bandcamp.com/album/dogs-light",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2573363801/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Almost Endless Possibilities: Adam Golebiewski Interviewed",
+      "article_link": "https://thequietus.com/interviews/adam-golebiewski-interview/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-21 08:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://uznam.bandcamp.com/album/meet-the-dragon",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3323848267/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Almost Endless Possibilities: Adam Golebiewski Interviewed",
+      "article_link": "https://thequietus.com/interviews/adam-golebiewski-interview/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-21 08:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://kakuhanadamgolebiewski.bandcamp.com/album/repercussions",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2676068035/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Almost Endless Possibilities: Adam Golebiewski Interviewed",
+      "article_link": "https://thequietus.com/interviews/adam-golebiewski-interview/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-21 08:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://adamgolebiewski.bandcamp.com/album/disarm",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3241116832/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Almost Endless Possibilities: Adam Golebiewski Interviewed",
+      "article_link": "https://thequietus.com/interviews/adam-golebiewski-interview/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-21 08:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://bocian.bandcamp.com/album/relephant",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=872881086/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Almost Endless Possibilities: Adam Golebiewski Interviewed",
+      "article_link": "https://thequietus.com/interviews/adam-golebiewski-interview/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-21 08:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://uznam.bandcamp.com/album/the-last-minute-or-later",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2155848413/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Almost Endless Possibilities: Adam Golebiewski Interviewed",
+      "article_link": "https://thequietus.com/interviews/adam-golebiewski-interview/",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2025-10-21 08:00"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://ambientblog.bandcamp.com/album/rope-to-the-sky-anniversary-collection",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=932491912/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "TWENTY YEARS! – (AND TWO FREE MIXES)",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/twenty-years/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-21 00:02"
+    }
+  ],
+  "13": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/PehbDQjAJQo",
+      "title": "Mushrooms in the mountains of Oaxaca: 5 Questions for Documentary Filmmakers Mónica Álvarez and Tatiana García",
+      "article_link": "https://themicrodose.substack.com/p/mushrooms-in-the-mountains-of-oaxaca",
+      "author": "Misha Schwarz",
+      "feed": "The Microdose: 5 Questions",
+      "date": "2025-10-20 19:10"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/7s8glZ-efMg",
+      "title": "Tanita Tikaram – LIAR (Love Isn’t A Right)",
+      "article_link": "https://www.musicomh.com/reviews/albums/tanita-tikaram-liar-love-isnt-a-right",
+      "author": "John Murphy",
+      "feed": "musicOMH",
+      "date": "2025-10-15 13:21"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5c6sMntanTQ",
+      "title": "AFI – Silver Bleeds The Black Sun…",
+      "article_link": "https://www.musicomh.com/reviews/albums/afi-silver-bleeds-the-black-sun",
+      "author": "Ross Horton",
+      "feed": "musicOMH",
+      "date": "2025-10-15 12:51"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://ambientcat.bandcamp.com/album/fragments-of-a-distant-now",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3756809333/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://kasperbjorke.bandcamp.com/album/heimr-music-for-landscapes-1",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3823776824/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://crowslabyrinth.bandcamp.com/album/neon-scenes-ii-echoes-of-then",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1590514399/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://morctapes.bandcamp.com/album/eye",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=106487661/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://dronarivm.bandcamp.com/album/the-arrow-of-time",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3492618605/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    }
+  ],
+  "14": [
+    {
+      "type": "bandcamp",
+      "url": "https://omnempathy.bandcamp.com/album/lulu-and-the-blacks",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1637092669/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://juliewalkingtonjimhoward.bandcamp.com/album/beyond-the-treeline",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3263192695/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://mendelkaelen.bandcamp.com/album/fertile-voids",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1373775012/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://zimoun.bandcamp.com/album/dust-resonance",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3191268842/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://quietdetails.bandcamp.com/album/forces-reactions-deflections",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1889881957/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://contaqtnewmusic.bandcamp.com/album/art-decade",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3294180158/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://brennanmcneill.bandcamp.com/album/dreaming-in-gamelan",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1817733983/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://ikivocal.bandcamp.com/album/body",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=86496927/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    }
+  ],
+  "15": [
+    {
+      "type": "bandcamp",
+      "url": "https://jessicamoss.bandcamp.com/album/unfolding",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4195284907/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "DreamScenes – October 2025",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/dreamscenes-october-2025/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-12 19:55"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://omnempathy.bandcamp.com/album/lulu-and-the-blacks",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1637092669/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Michael Begg * Lukas Lauermann",
+      "article_link": "https://www.ambientblog.net/blog/2025-10/begg-lauermann/",
+      "author": "Peter van Cooten",
+      "feed": "Ambientblog",
+      "date": "2025-10-06 20:29"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/vjWKNw4nKOs",
+      "title": "The King of Acid: Owsley “Bear” Stanley ＆ the Psychedelic Underground",
+      "article_link": "https://tripsitter.substack.com/p/owsley-stanley",
+      "author": "Tripsitter",
+      "feed": "Tripsitter",
+      "date": "2025-10-01 16:04"
+    }
+  ]
+};
+        const totalPages = 15;
+        const maxPagesButtons = 15;
+        let currentPage = 1;
+
+        // FUNCIONES CORREGIDAS PARA GENERAR EMBEDS
+        function generateBandcampEmbed(item) {
+            // CORRECCIÓN CRÍTICA: Usar directamente el HTML del embed que viene del servidor
+            // en lugar de intentar generarlo en el cliente
+            if (item.embed_html) {
+                return item.embed_html;
+            }
+            return `<p>URL de Bandcamp: <a href="${item.url}" target="_blank">${item.url}</a></p>`;
+        }
+
+        function generateYoutubeEmbed(url) {
+            // La URL ya viene correcta desde Python: https://www.youtube-nocookie.com/embed/VIDEO_ID
+            // Solo agregamos los parámetros necesarios
+            const embedUrl = url.includes('?') ? url : `${url}`;
+            return `<iframe width="560" height="315" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        }
+
+        function generateSoundcloudEmbed(url) {
+            const encodedUrl = encodeURIComponent(url);
+            const embedUrl = `https://w.soundcloud.com/player/?url=${encodedUrl}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
+            return `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="${embedUrl}"></iframe>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateEmbedHTML(item) {
+            const typeIcons = {
+                'bandcamp': '🎵',
+                'youtube': '📺',
+                'soundcloud': '🔊'
+            };
+
+            const typeNames = {
+                'bandcamp': 'Bandcamp',
+                'youtube': 'YouTube',
+                'soundcloud': 'SoundCloud'
+            };
+
+            let embedCode = '';
+            if (item.type === 'bandcamp') {
+                embedCode = generateBandcampEmbed(item);
+            } else if (item.type === 'youtube') {
+                embedCode = generateYoutubeEmbed(item.url);
+            } else if (item.type === 'soundcloud') {
+                embedCode = generateSoundcloudEmbed(item.url);
+            }
+
+            return `
+                <div class="embed-item">
+                    <div class="embed-info">
+                        <div class="embed-type">${typeIcons[item.type]} ${typeNames[item.type]}</div>
+                        <h3>${escapeHtml(item.title)}</h3>
+                        <p class="meta">
+                            📅 ${item.date}
+                            ${item.author ? ` | 👤 ${escapeHtml(item.author)}` : ''}
+                            ${item.feed ? ` | 📡 ${escapeHtml(item.feed)}` : ''}
+                        </p>
+                        <p><a href="${escapeHtml(item.article_link)}" target="_blank">Ver artículo original →</a></p>
+                    </div>
+                    <div class="embed-container">
+                        ${embedCode}
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadPage(pageNum) {
+            if (pageNum < 1 || pageNum > totalPages) return;
+
+            const content = document.getElementById('content');
+            const pageData = allPagesData[String(pageNum)];
+
+            if (!pageData) {
+                content.innerHTML = '<div class="loading">Página no encontrada</div>';
+                return;
+            }
+
+            let html = '<div class="embeds-grid">';
+            for (const item of pageData) {
+                html += generateEmbedHTML(item);
+            }
+            html += '</div>';
+
+            content.innerHTML = html;
+            currentPage = pageNum;
+            renderPagination();
+
+            // Scroll al principio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderPagination() {
+            const paginationHTML = createPaginationButtons();
+            document.getElementById('pagination-top').innerHTML = paginationHTML;
+            document.getElementById('pagination-bottom').innerHTML = paginationHTML;
+        }
+
+        function createPaginationButtons() {
+            let html = '';
+
+            // Botón anterior
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage - 1})">← Anterior</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>← Anterior</button>`;
+            }
+
+            // Calcular rango de páginas a mostrar
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesButtons - 1);
+
+            // Ajustar si estamos cerca del final
+            if (endPage - startPage < maxPagesButtons - 1) {
+                startPage = Math.max(1, endPage - maxPagesButtons + 1);
+            }
+
+            // Primera página si no está en el rango
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    html += `<span class="page-info">...</span>`;
+                }
+            }
+
+            // Páginas numeradas
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    html += `<button class="page-btn active">${i}</button>`;
+                } else {
+                    html += `<button class="page-btn" onclick="changePage(${i})">${i}</button>`;
+                }
+            }
+
+            // Última página si no está en el rango
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span class="page-info">...</span>`;
+                }
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            // Botón siguiente
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage + 1})")>Siguiente →</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>Siguiente →</button>`;
+            }
+
+            return html;
+        }
+
+        function changePage(pageNum) {
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                loadPage(pageNum);
+            }
+        }
+
+        // Cargar primera página al inicio
+        console.log('Datos cargados:', Object.keys(allPagesData).length, 'páginas');
+        loadPage(1);
+
+        // Soporte para teclas de navegación
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changePage(currentPage - 1);
+            } else if (e.key === 'ArrowRight') {
+                changePage(currentPage + 1);
+            }
+        });
+    </script>
+</body>
+</html>
