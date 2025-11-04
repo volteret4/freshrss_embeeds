@@ -2,6 +2,10 @@
 """
 Script para generar un index.html con todos los feeds de FreshRSS embeds.
 Lee el directorio freshrss_embeds y crea un índice navegable.
+
+MEJORAS:
+- Tema oscuro con color de fondo #1f1f28
+- Diseño actualizado con la paleta de colores oscura
 """
 
 import os
@@ -15,7 +19,7 @@ from datetime import datetime
 
 def scan_embeds_directory(directory):
     """
-    Escanea el directorio buscando archivos HTML y sus datos asociados.
+    Escanea el directorio buscando archivos HTML y extrae datos de los embeds incrustados.
 
     Returns:
         Lista de diccionarios con información de cada feed
@@ -23,22 +27,18 @@ def scan_embeds_directory(directory):
     feeds = []
 
     if not os.path.exists(directory):
-        print(f"❌ El directorio {directory} no existe")
+        print(f"✗ El directorio {directory} no existe")
         return feeds
 
     # Buscar archivos HTML
     html_files = [f for f in os.listdir(directory) if f.endswith('.html') and f != 'index.html']
 
-    print(f"📁 Escaneando {directory}...")
+    print(f"🔍 Escaneando {directory}...")
     print(f"📄 Archivos HTML encontrados: {len(html_files)}\n")
 
     for html_file in sorted(html_files):
         # Obtener el nombre base del archivo
         base_name = html_file[:-5]  # Quitar .html
-
-        # Buscar el archivo JSON de datos
-        json_file = f"{base_name}_data.json"
-        json_path = os.path.join(directory, json_file)
 
         feed_info = {
             'html_file': html_file,
@@ -51,42 +51,53 @@ def scan_embeds_directory(directory):
             'latest_date': None
         }
 
-        # Si existe el JSON, leer estadísticas
-        if os.path.exists(json_path):
-            try:
-                with open(json_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    feed_info['pages'] = len(data)
+        # Leer el HTML y extraer datos del JavaScript
+        html_path = os.path.join(directory, html_file)
+        try:
+            with open(html_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
 
-                    # Contar embeds por tipo
-                    latest_timestamp = 0
-                    for page_num, page_data in data.items():
-                        for item in page_data:
-                            feed_info['total_embeds'] += 1
+            # Buscar allPagesData en el JavaScript
+            pages_data_match = re.search(
+                r'const allPagesData = ({.+?});',
+                html_content,
+                re.DOTALL
+            )
 
-                            if item['type'] == 'bandcamp':
-                                feed_info['bandcamp'] += 1
-                            elif item['type'] == 'youtube':
-                                feed_info['youtube'] += 1
-                            elif item['type'] == 'soundcloud':
-                                feed_info['soundcloud'] += 1
+            if pages_data_match:
+                pages_data_json = pages_data_match.group(1)
+                data = json.loads(pages_data_json)
+                feed_info['pages'] = len(data)
 
-                            # Encontrar fecha más reciente
-                            try:
-                                date_str = item['date']
-                                date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M')
-                                timestamp = date_obj.timestamp()
-                                if timestamp > latest_timestamp:
-                                    latest_timestamp = timestamp
-                                    feed_info['latest_date'] = date_str
-                            except:
-                                pass
+                # Contar embeds por tipo
+                latest_timestamp = 0
+                for page_num, page_data in data.items():
+                    for item in page_data:
+                        feed_info['total_embeds'] += 1
+
+                        if item['type'] == 'bandcamp':
+                            feed_info['bandcamp'] += 1
+                        elif item['type'] == 'youtube':
+                            feed_info['youtube'] += 1
+                        elif item['type'] == 'soundcloud':
+                            feed_info['soundcloud'] += 1
+
+                        # Encontrar fecha más reciente
+                        try:
+                            date_str = item['date']
+                            date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M')
+                            timestamp = date_obj.timestamp()
+                            if timestamp > latest_timestamp:
+                                latest_timestamp = timestamp
+                                feed_info['latest_date'] = date_str
+                        except:
+                            pass
 
                 print(f"  ✓ {feed_info['name']}: {feed_info['total_embeds']} embeds ({feed_info['pages']} páginas)")
-            except Exception as e:
-                print(f"  ⚠ Error leyendo {json_file}: {e}")
-        else:
-            print(f"  ⚠ {html_file} (sin datos JSON)")
+            else:
+                print(f"  ⚠  {html_file} (no se encontró allPagesData)")
+        except Exception as e:
+            print(f"  ⚠  Error leyendo {html_file}: {e}")
 
         feeds.append(feed_info)
 
@@ -96,6 +107,7 @@ def scan_embeds_directory(directory):
 def generate_index_html(feeds, output_dir):
     """
     Genera el archivo index.html con todos los feeds.
+    Tema oscuro con color de fondo #1f1f28
     """
     total_embeds = sum(f['total_embeds'] for f in feeds)
     total_bandcamp = sum(f['bandcamp'] for f in feeds)
@@ -157,7 +169,7 @@ def generate_index_html(feeds, output_dir):
 
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1f1f28;
             min-height: 100vh;
             padding: 20px;
         }}
@@ -165,28 +177,28 @@ def generate_index_html(feeds, output_dir):
         .container {{
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: #2a2a37;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }}
 
         header {{
             text-align: center;
             margin-bottom: 40px;
             padding-bottom: 30px;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #7e9cd8;
         }}
 
         h1 {{
             font-size: 3em;
-            color: #2d3748;
+            color: #dcd7ba;
             margin-bottom: 10px;
         }}
 
         .subtitle {{
             font-size: 1.2em;
-            color: #718096;
+            color: #938aa9;
             margin-bottom: 20px;
         }}
 
@@ -199,12 +211,12 @@ def generate_index_html(feeds, output_dir):
         }}
 
         .global-stat {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #7e9cd8 0%, #957fb8 100%);
+            color: #1f1f28;
             padding: 20px 30px;
             border-radius: 15px;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(126, 156, 216, 0.4);
         }}
 
         .global-stat-number {{
@@ -228,15 +240,21 @@ def generate_index_html(feeds, output_dir):
             max-width: 600px;
             padding: 15px 25px;
             font-size: 1.1em;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #54546d;
+            background: #16161d;
+            color: #dcd7ba;
             border-radius: 50px;
             outline: none;
             transition: all 0.3s;
         }}
 
         .search-input:focus {{
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #7e9cd8;
+            box-shadow: 0 0 0 3px rgba(126, 156, 216, 0.2);
+        }}
+
+        .search-input::placeholder {{
+            color: #938aa9;
         }}
 
         .feeds-grid {{
@@ -247,10 +265,10 @@ def generate_index_html(feeds, output_dir):
         }}
 
         .feed-card {{
-            background: #f8f9fa;
+            background: #16161d;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
@@ -258,12 +276,12 @@ def generate_index_html(feeds, output_dir):
 
         .feed-card:hover {{
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.4);
         }}
 
         .feed-title {{
             font-size: 1.5em;
-            color: #2d3748;
+            color: #dcd7ba;
             margin-bottom: 15px;
             word-wrap: break-word;
         }}
@@ -278,7 +296,7 @@ def generate_index_html(feeds, output_dir):
         .stat-item {{
             text-align: center;
             padding: 10px;
-            background: white;
+            background: #2a2a37;
             border-radius: 8px;
         }}
 
@@ -291,27 +309,27 @@ def generate_index_html(feeds, output_dir):
         .stat-number {{
             font-size: 1.3em;
             font-weight: bold;
-            color: #667eea;
+            color: #7e9cd8;
             display: block;
         }}
 
         .stat-label {{
             font-size: 0.8em;
-            color: #718096;
+            color: #938aa9;
             display: block;
             margin-top: 2px;
         }}
 
         .feed-date {{
             font-size: 0.9em;
-            color: #718096;
+            color: #938aa9;
             margin-bottom: 15px;
         }}
 
         .feed-link {{
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #7e9cd8 0%, #957fb8 100%);
+            color: #1f1f28;
             padding: 12px 30px;
             border-radius: 25px;
             text-decoration: none;
@@ -323,22 +341,52 @@ def generate_index_html(feeds, output_dir):
 
         .feed-link:hover {{
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(126, 156, 216, 0.4);
         }}
 
         .no-results {{
             text-align: center;
             padding: 60px 20px;
-            color: #718096;
+            color: #938aa9;
             font-size: 1.2em;
+        }}
+
+        .tools-link {{
+            text-align: center;
+            margin: 30px 0;
+        }}
+
+        .tools-link a {{
+            display: inline-block;
+            background: #54546d;
+            color: #dcd7ba;
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }}
+
+        .tools-link a:hover {{
+            background: #625e7f;
+            transform: translateY(-2px);
         }}
 
         footer {{
             text-align: center;
             margin-top: 50px;
             padding-top: 30px;
-            border-top: 2px solid #e2e8f0;
-            color: #718096;
+            border-top: 2px solid #54546d;
+            color: #938aa9;
+        }}
+
+        footer a {{
+            color: #7e9cd8;
+            text-decoration: none;
+        }}
+
+        footer a:hover {{
+            text-decoration: underline;
         }}
 
         @media (max-width: 768px) {{
@@ -390,6 +438,10 @@ def generate_index_html(feeds, output_dir):
             </div>
         </header>
 
+        <div class="tools-link">
+            <a href="sync_tools_freshrss.html">🔧 Herramientas de Sincronización</a>
+        </div>
+
         <div class="search-box">
             <input type="text"
                    id="search"
@@ -409,9 +461,7 @@ def generate_index_html(feeds, output_dir):
         <footer>
             <p>Generado el {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             <p style="margin-top: 10px;">
-                <a href="https://github.com/FreshRSS/FreshRSS" target="_blank" style="color: #667eea; text-decoration: none;">
-                    FreshRSS Embed Generator
-                </a>
+                FreshRSS Embed Generator | Tema oscuro #1f1f28
             </p>
         </footer>
     </div>
@@ -453,7 +503,7 @@ def generate_index_html(feeds, output_dir):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Genera un index.html para los embeds de FreshRSS'
+        description='Genera un index.html para los embeds de FreshRSS (VERSIÓN TEMA OSCURO)'
     )
 
     parser.add_argument('--input-dir', default='freshrss_embeds',
@@ -469,7 +519,7 @@ def main():
     feeds = scan_embeds_directory(args.input_dir)
 
     if not feeds:
-        print("\n❌ No se encontraron feeds en el directorio")
+        print("\n✗ No se encontraron feeds en el directorio")
         print(f"   Asegúrate de que {args.input_dir} contenga archivos HTML generados")
         return
 
@@ -487,6 +537,7 @@ def main():
     print(f"📊 Total de feeds: {len(feeds)}")
     print(f"🎵 Total de embeds: {sum(f['total_embeds'] for f in feeds)}")
     print(f"\n🌐 Abre el archivo en tu navegador para ver el índice")
+    print(f"🎨 Tema oscuro: #1f1f28")
     print(f"{'='*80}\n")
 
 
