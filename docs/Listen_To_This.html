@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listen To This - Embeds</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1f1f28;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: #dcd7ba;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .stats {
+            color: #c8c093;
+            font-size: 1.1em;
+        }
+
+        .embeds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .embeds-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .embed-item {
+            background: #2a2a37;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+        }
+
+        .embed-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+        }
+
+        .embed-item.listened {
+            opacity: 0.4;
+            background: #1a1a22;
+        }
+
+        .embed-item.listened:hover {
+            opacity: 0.6;
+        }
+
+        .embed-info {
+            margin-bottom: 15px;
+        }
+
+        .embed-type {
+            display: inline-block;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .embed-info h3 {
+            font-size: 1.1em;
+            color: #dcd7ba;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .embed-info .meta {
+            font-size: 0.9em;
+            color: #938aa9;
+            margin-bottom: 8px;
+        }
+
+        .embed-info a {
+            color: #7e9cd8;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .embed-info a:hover {
+            text-decoration: underline;
+            color: #957fb8;
+        }
+
+        .embed-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .embed-container iframe {
+            max-width: 100%;
+        }
+
+        .listen-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #7e9cd8;
+            color: #1f1f28;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            width: 100%;
+        }
+
+        .listen-btn:hover {
+            background: #957fb8;
+            transform: translateY(-2px);
+        }
+
+        .listen-btn.listened {
+            background: #54546d;
+            color: #938aa9;
+        }
+
+        .listen-btn.listened:hover {
+            background: #625e7f;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            background: #54546d;
+            color: #dcd7ba;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #625e7f;
+        }
+
+        .page-btn:disabled {
+            background: #2a2a37;
+            color: #54546d;
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            background: #7e9cd8;
+            color: #1f1f28;
+            font-weight: bold;
+        }
+
+        .page-info {
+            padding: 10px 20px;
+            background: #2a2a37;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #c8c093;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #938aa9;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #2a2a37;
+            color: #938aa9;
+        }
+
+        footer a {
+            color: #7e9cd8;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Listen To This</h1>
+            <div class="stats">
+                Total: 43 embeds únicos | Páginas: 6
+            </div>
+        </header>
+
+        <div id="pagination-top" class="pagination"></div>
+        <div id="content"></div>
+        <div id="pagination-bottom" class="pagination"></div>
+
+        <footer>
+            <p>Generado desde FreshRSS (versión mejorada con tema oscuro y sincronización)</p>
+            <p style="margin-top: 10px;">
+                <a href="sync_tools.html">🔧 Herramientas de Sincronización</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Datos incrustados directamente en el HTML
+        const allPagesData = {
+  "1": [
+    {
+      "type": "bandcamp",
+      "url": "https://beathappening.bandcamp.com/album/you-turn-me-on-klp007",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1955892065/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "album_1955892065"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/wOobJH-NniE",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/wOobJH-NniE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/y25stK5ymlA",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/y25stK5ymlA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Yam5uK6e-bQ",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/Yam5uK6e-bQ"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/zHks152h70c",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/zHks152h70c"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/dY-_m6vUTUY",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/dY-_m6vUTUY"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/a-mAK3uB2_0",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/a-mAK3uB2_0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/rM8bHY2MCaA",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/rM8bHY2MCaA"
+    }
+  ],
+  "2": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/_WcWHZc8s2I",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/_WcWHZc8s2I"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/UMqB3817qNU",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/UMqB3817qNU"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/0gQVS2fCsek",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/0gQVS2fCsek"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/2tOutF8B3f8",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/2tOutF8B3f8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/D1EDKvXRKd0",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/D1EDKvXRKd0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/D0wDo3pQ7MQ",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/D0wDo3pQ7MQ"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/eUuCXE6nnNs",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/eUuCXE6nnNs"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/nfBrQovw7JQ",
+      "title": "15 Favorite Releases of 2022",
+      "article_link": "https://www.listentothis.info/2022/12/15-favorite-releases-of-2022/?utm_source=rss&utm_medium=rss&utm_campaign=15-favorite-releases-of-2022",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-12-30 06:47",
+      "id": "https://www.youtube.com/embed/nfBrQovw7JQ"
+    }
+  ],
+  "3": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/DSXqJzkcry4",
+      "title": "Oscilation Circuit – Série Réflexion 1, 1984",
+      "article_link": "https://www.listentothis.info/2022/01/oscilation-circuit-serie-reflexion-1-1984/?utm_source=rss&utm_medium=rss&utm_campaign=oscilation-circuit-serie-reflexion-1-1984",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-08 01:50",
+      "id": "https://www.youtube.com/embed/DSXqJzkcry4"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://haroldbudd.bandcamp.com/album/by-the-dawns-early-light",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=378708907/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "album_378708907"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://heartsofspacerecords.bandcamp.com/album/sirens",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=889398764/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "album_889398764"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://warprecords.bandcamp.com/album/frequencies",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1041554806/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "album_1041554806"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://beathappening.bandcamp.com/album/dreamy",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2636999028/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "album_2636999028"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/-xaLb7aJVxI",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/-xaLb7aJVxI"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/wWUC2-ypnDQ",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/wWUC2-ypnDQ"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/-HIFKBhOV40",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/-HIFKBhOV40"
+    }
+  ],
+  "4": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Jl8iYAo90pE",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/Jl8iYAo90pE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/w8JrJrDUNGk",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/w8JrJrDUNGk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/LTyNvD8Jaos",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/LTyNvD8Jaos"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/jBknsqfFERE",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/jBknsqfFERE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/ej6rRpK4uoY",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/ej6rRpK4uoY"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/um06u9Zg8ww",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/um06u9Zg8ww"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/BvWP711wJH8",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/BvWP711wJH8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5KDS4u8-D4Q",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/5KDS4u8-D4Q"
+    }
+  ],
+  "5": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/KJUU274KTd0",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/KJUU274KTd0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/TLNM8kj9RPk",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/TLNM8kj9RPk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/UM-Yg9tSLg8",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/UM-Yg9tSLg8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/J5sdUuXdW0s",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/J5sdUuXdW0s"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Q9NhaG8waiw",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/Q9NhaG8waiw"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Fy5Q35_aKRU",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/Fy5Q35_aKRU"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/fH0NQzXlzyQ",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/fH0NQzXlzyQ"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/8hYvGGkAsUI",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/8hYvGGkAsUI"
+    }
+  ],
+  "6": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/u1AOWwMM_lA",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/u1AOWwMM_lA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/pEw3B3E5F6s",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/pEw3B3E5F6s"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/eoJ0uEUu51c",
+      "title": "22 Favorite Releases of 2021",
+      "article_link": "https://www.listentothis.info/2022/01/22-favorite-releases-of-2021/?utm_source=rss&utm_medium=rss&utm_campaign=22-favorite-releases-of-2021",
+      "author": "Jen Monroe",
+      "feed": "Listen To This",
+      "date": "2022-01-01 03:32",
+      "id": "https://www.youtube.com/embed/eoJ0uEUu51c"
+    }
+  ]
+};
+        const totalPages = 6;
+        const maxPagesButtons = 15;
+        const feedName = 'Listen_To_This';
+        const storageKey = `freshrss_listened_${feedName}`;
+
+        let currentPage = 1;
+        let listenedItems = new Set();
+
+        // Cargar items escuchados desde localStorage
+        function loadListenedItems() {
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) {
+                    listenedItems = new Set(JSON.parse(stored));
+                    console.log(`Loaded ${listenedItems.size} listened items for ${feedName}`);
+                }
+            } catch (error) {
+                console.error('Error loading listened items:', error);
+            }
+        }
+
+        // Guardar items escuchados en localStorage
+        function saveListenedItems() {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(Array.from(listenedItems)));
+                console.log(`Saved ${listenedItems.size} listened items for ${feedName}`);
+            } catch (error) {
+                console.error('Error saving listened items:', error);
+            }
+        }
+
+        // Marcar/desmarcar item como escuchado
+        function toggleListened(itemId) {
+            if (listenedItems.has(itemId)) {
+                listenedItems.delete(itemId);
+            } else {
+                listenedItems.add(itemId);
+            }
+            saveListenedItems();
+            loadPage(currentPage); // Recargar página actual para actualizar visual
+        }
+
+        // FUNCIONES CORREGIDAS PARA GENERAR EMBEDS
+        function generateBandcampEmbed(item) {
+            // CORRECCIÓN CRÍTICA: Usar directamente el HTML del embed que viene del servidor
+            // en lugar de intentar generarlo en el cliente
+            if (item.embed_html) {
+                return item.embed_html;
+            }
+            return `<p>URL de Bandcamp: <a href="${item.url}" target="_blank">${item.url}</a></p>`;
+        }
+
+        function generateYoutubeEmbed(url) {
+            // La URL ya viene correcta desde Python: https://www.youtube.com/embed/VIDEO_ID
+            const embedUrl = url.includes('?') ? url : `${url}`;
+            return `<iframe width="560" height="315" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        }
+
+        function generateSoundcloudEmbed(url) {
+            const encodedUrl = encodeURIComponent(url);
+            const embedUrl = `https://w.soundcloud.com/player/?url=${encodedUrl}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
+            return `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="${embedUrl}"></iframe>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateEmbedHTML(item) {
+            const typeIcons = {
+                'bandcamp': '🎵',
+                'youtube': '📺',
+                'soundcloud': '🔊'
+            };
+
+            const typeNames = {
+                'bandcamp': 'Bandcamp',
+                'youtube': 'YouTube',
+                'soundcloud': 'SoundCloud'
+            };
+
+            let embedCode = '';
+            if (item.type === 'bandcamp') {
+                embedCode = generateBandcampEmbed(item);
+            } else if (item.type === 'youtube') {
+                embedCode = generateYoutubeEmbed(item.url);
+            } else if (item.type === 'soundcloud') {
+                embedCode = generateSoundcloudEmbed(item.url);
+            }
+
+            const isListened = listenedItems.has(item.id);
+            const listenedClass = isListened ? 'listened' : '';
+            const btnText = isListened ? '✓ Escuchado' : 'Marcar como escuchado';
+            const btnClass = isListened ? 'listened' : '';
+
+            return `
+                <div class="embed-item ${listenedClass}" data-id="${escapeHtml(item.id)}">
+                    <div class="embed-info">
+                        <div class="embed-type">${typeIcons[item.type]} ${typeNames[item.type]}</div>
+                        <h3>${escapeHtml(item.title)}</h3>
+                        <p class="meta">
+                            📅 ${item.date}
+                            ${item.author ? ` | 👤 ${escapeHtml(item.author)}` : ''}
+                            ${item.feed ? ` | 📡 ${escapeHtml(item.feed)}` : ''}
+                        </p>
+                        <p><a href="${escapeHtml(item.article_link)}" target="_blank">Ver artículo original →</a></p>
+                    </div>
+                    <div class="embed-container">
+                        ${embedCode}
+                    </div>
+                    <button class="listen-btn ${btnClass}" onclick="toggleListened('${escapeHtml(item.id)}')">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+        }
+
+        function loadPage(pageNum) {
+            if (pageNum < 1 || pageNum > totalPages) return;
+
+            const content = document.getElementById('content');
+            const pageData = allPagesData[String(pageNum)];
+
+            if (!pageData) {
+                content.innerHTML = '<div class="loading">Página no encontrada</div>';
+                return;
+            }
+
+            let html = '<div class="embeds-grid">';
+            for (const item of pageData) {
+                html += generateEmbedHTML(item);
+            }
+            html += '</div>';
+
+            content.innerHTML = html;
+            currentPage = pageNum;
+            renderPagination();
+
+            // Scroll al principio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderPagination() {
+            const paginationHTML = createPaginationButtons();
+            document.getElementById('pagination-top').innerHTML = paginationHTML;
+            document.getElementById('pagination-bottom').innerHTML = paginationHTML;
+        }
+
+        function createPaginationButtons() {
+            let html = '';
+
+            // Botón anterior
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage - 1})">← Anterior</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>← Anterior</button>`;
+            }
+
+            // Calcular rango de páginas a mostrar
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesButtons - 1);
+
+            // Ajustar si estamos cerca del final
+            if (endPage - startPage < maxPagesButtons - 1) {
+                startPage = Math.max(1, endPage - maxPagesButtons + 1);
+            }
+
+            // Primera página si no está en el rango
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    html += `<span class="page-info">...</span>`;
+                }
+            }
+
+            // Páginas numeradas
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    html += `<button class="page-btn active">${i}</button>`;
+                } else {
+                    html += `<button class="page-btn" onclick="changePage(${i})">${i}</button>`;
+                }
+            }
+
+            // Última página si no está en el rango
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span class="page-info">...</span>`;
+                }
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            // Botón siguiente
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage + 1})")>Siguiente →</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>Siguiente →</button>`;
+            }
+
+            return html;
+        }
+
+        function changePage(pageNum) {
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                loadPage(pageNum);
+            }
+        }
+
+        // Cargar listened items y primera página al inicio
+        loadListenedItems();
+        console.log('Datos cargados:', Object.keys(allPagesData).length, 'páginas');
+        loadPage(1);
+
+        // Soporte para teclas de navegación
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changePage(currentPage - 1);
+            } else if (e.key === 'ArrowRight') {
+                changePage(currentPage + 1);
+            }
+        });
+    </script>
+</body>
+</html>
