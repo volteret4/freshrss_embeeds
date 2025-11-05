@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshRSS Embeds - Índice</title>
-    <link rel="icon" type="image/x-icon" href="/images/rss.png">
-
     <style>
         * {
             margin: 0;
@@ -15,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1f1f28;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -23,28 +21,28 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: #2a2a37;
+            background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         header {
             text-align: center;
             margin-bottom: 40px;
             padding-bottom: 30px;
-            border-bottom: 3px solid #7e9cd8;
+            border-bottom: 3px solid #667eea;
         }
 
         h1 {
             font-size: 3em;
-            color: #dcd7ba;
+            color: #2d3748;
             margin-bottom: 10px;
         }
 
         .subtitle {
             font-size: 1.2em;
-            color: #938aa9;
+            color: #718096;
             margin-bottom: 20px;
         }
 
@@ -57,12 +55,12 @@
         }
 
         .global-stat {
-            background: linear-gradient(135deg, #7e9cd8 0%, #957fb8 100%);
-            color: #1f1f28;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 20px 30px;
             border-radius: 15px;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(126, 156, 216, 0.4);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .global-stat-number {
@@ -86,21 +84,15 @@
             max-width: 600px;
             padding: 15px 25px;
             font-size: 1.1em;
-            border: 2px solid #54546d;
-            background: #16161d;
-            color: #dcd7ba;
+            border: 2px solid #e2e8f0;
             border-radius: 50px;
             outline: none;
             transition: all 0.3s;
         }
 
         .search-input:focus {
-            border-color: #7e9cd8;
-            box-shadow: 0 0 0 3px rgba(126, 156, 216, 0.2);
-        }
-
-        .search-input::placeholder {
-            color: #938aa9;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .feeds-grid {
@@ -111,10 +103,10 @@
         }
 
         .feed-card {
-            background: #16161d;
+            background: #f8f9fa;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
@@ -122,12 +114,12 @@
 
         .feed-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
         }
 
         .feed-title {
             font-size: 1.5em;
-            color: #dcd7ba;
+            color: #2d3748;
             margin-bottom: 15px;
             word-wrap: break-word;
         }
@@ -142,7 +134,7 @@
         .stat-item {
             text-align: center;
             padding: 10px;
-            background: #2a2a37;
+            background: white;
             border-radius: 8px;
         }
 
@@ -155,27 +147,27 @@
         .stat-number {
             font-size: 1.3em;
             font-weight: bold;
-            color: #7e9cd8;
+            color: #667eea;
             display: block;
         }
 
         .stat-label {
             font-size: 0.8em;
-            color: #938aa9;
+            color: #718096;
             display: block;
             margin-top: 2px;
         }
 
         .feed-date {
             font-size: 0.9em;
-            color: #938aa9;
+            color: #718096;
             margin-bottom: 15px;
         }
 
         .feed-link {
             display: inline-block;
-            background: linear-gradient(135deg, #7e9cd8 0%, #957fb8 100%);
-            color: #1f1f28;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 12px 30px;
             border-radius: 25px;
             text-decoration: none;
@@ -187,52 +179,22 @@
 
         .feed-link:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(126, 156, 216, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .no-results {
             text-align: center;
             padding: 60px 20px;
-            color: #938aa9;
+            color: #718096;
             font-size: 1.2em;
-        }
-
-        .tools-link {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .tools-link a {
-            display: inline-block;
-            background: #54546d;
-            color: #dcd7ba;
-            padding: 15px 30px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .tools-link a:hover {
-            background: #625e7f;
-            transform: translateY(-2px);
         }
 
         footer {
             text-align: center;
             margin-top: 50px;
             padding-top: 30px;
-            border-top: 2px solid #54546d;
-            color: #938aa9;
-        }
-
-        footer a {
-            color: #7e9cd8;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
+            border-top: 2px solid #e2e8f0;
+            color: #718096;
         }
 
         @media (max-width: 768px) {
@@ -262,19 +224,19 @@
 
             <div class="global-stats">
                 <div class="global-stat">
-                    <span class="global-stat-number">7</span>
+                    <span class="global-stat-number">5</span>
                     <span class="global-stat-label">Feeds</span>
                 </div>
                 <div class="global-stat">
-                    <span class="global-stat-number">3698</span>
+                    <span class="global-stat-number">0</span>
                     <span class="global-stat-label">Total embeds</span>
                 </div>
                 <div class="global-stat">
-                    <span class="global-stat-number">🎵 1611</span>
+                    <span class="global-stat-number">🎵 0</span>
                     <span class="global-stat-label">Bandcamp</span>
                 </div>
                 <div class="global-stat">
-                    <span class="global-stat-number">📺 2087</span>
+                    <span class="global-stat-number">📺 0</span>
                     <span class="global-stat-label">YouTube</span>
                 </div>
                 <div class="global-stat">
@@ -283,10 +245,6 @@
                 </div>
             </div>
         </header>
-
-        <div class="tools-link">
-            <a href="sync_tools_freshrss.html">🔧 Herramientas de Sincronización</a>
-        </div>
 
         <div class="search-box">
             <input type="text"
@@ -302,172 +260,32 @@
             <h3 class="feed-title">Ambientblog</h3>
             <div class="feed-stats">
                 <div class="stat-item">
-                    <span class="stat-number">333</span>
+                    <span class="stat-number">0</span>
                     <span class="stat-label">Total</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-icon">🎵</span>
-                    <span class="stat-number">327</span>
+                    <span class="stat-number">0</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-icon">📺</span>
-                    <span class="stat-number">6</span>
+                    <span class="stat-number">0</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-icon">🔊</span>
                     <span class="stat-number">0</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number">42</span>
+                    <span class="stat-number">0</span>
                     <span class="stat-label">páginas</span>
                 </div>
             </div>
-            <div class='feed-date'>📅 Última actualización: 2025-10-31 10:52</div>
+            
             <a href="Ambientblog.html" class="feed-link">Ver embeds →</a>
         </div>
         
         <div class="feed-card">
             <h3 class="feed-title">Ban Ban Ton Ton</h3>
-            <div class="feed-stats">
-                <div class="stat-item">
-                    <span class="stat-number">489</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🎵</span>
-                    <span class="stat-number">109</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">📺</span>
-                    <span class="stat-number">380</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🔊</span>
-                    <span class="stat-number">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">62</span>
-                    <span class="stat-label">páginas</span>
-                </div>
-            </div>
-            <div class='feed-date'>📅 Última actualización: 2025-06-27 02:01</div>
-            <a href="Ban_Ban_Ton_Ton.html" class="feed-link">Ver embeds →</a>
-        </div>
-        
-        <div class="feed-card">
-            <h3 class="feed-title">Depósito sonoro</h3>
-            <div class="feed-stats">
-                <div class="stat-item">
-                    <span class="stat-number">1413</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🎵</span>
-                    <span class="stat-number">585</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">📺</span>
-                    <span class="stat-number">828</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🔊</span>
-                    <span class="stat-number">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">177</span>
-                    <span class="stat-label">páginas</span>
-                </div>
-            </div>
-            <div class='feed-date'>📅 Última actualización: 2025-10-29 07:00</div>
-            <a href="Depósito_sonoro.html" class="feed-link">Ver embeds →</a>
-        </div>
-        
-        <div class="feed-card">
-            <h3 class="feed-title">FW Rare Jazz Vinyl Collector</h3>
-            <div class="feed-stats">
-                <div class="stat-item">
-                    <span class="stat-number">1413</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🎵</span>
-                    <span class="stat-number">585</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">📺</span>
-                    <span class="stat-number">828</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🔊</span>
-                    <span class="stat-number">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">177</span>
-                    <span class="stat-label">páginas</span>
-                </div>
-            </div>
-            <div class='feed-date'>📅 Última actualización: 2025-10-29 07:00</div>
-            <a href="FW_Rare_Jazz_Vinyl_Collector.html" class="feed-link">Ver embeds →</a>
-        </div>
-        
-        <div class="feed-card">
-            <h3 class="feed-title">Listen To This</h3>
-            <div class="feed-stats">
-                <div class="stat-item">
-                    <span class="stat-number">43</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🎵</span>
-                    <span class="stat-number">5</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">📺</span>
-                    <span class="stat-number">38</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🔊</span>
-                    <span class="stat-number">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">6</span>
-                    <span class="stat-label">páginas</span>
-                </div>
-            </div>
-            <div class='feed-date'>📅 Última actualización: 2022-12-30 06:47</div>
-            <a href="Listen_To_This.html" class="feed-link">Ver embeds →</a>
-        </div>
-        
-        <div class="feed-card">
-            <h3 class="feed-title">Lost Turntable</h3>
-            <div class="feed-stats">
-                <div class="stat-item">
-                    <span class="stat-number">7</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🎵</span>
-                    <span class="stat-number">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">📺</span>
-                    <span class="stat-number">7</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">🔊</span>
-                    <span class="stat-number">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">1</span>
-                    <span class="stat-label">páginas</span>
-                </div>
-            </div>
-            <div class='feed-date'>📅 Última actualización: 2025-08-08 01:46</div>
-            <a href="Lost_Turntable.html" class="feed-link">Ver embeds →</a>
-        </div>
-        
-        <div class="feed-card">
-            <h3 class="feed-title">sync tools freshrss</h3>
             <div class="feed-stats">
                 <div class="stat-item">
                     <span class="stat-number">0</span>
@@ -491,7 +309,91 @@
                 </div>
             </div>
             
-            <a href="sync_tools_freshrss.html" class="feed-link">Ver embeds →</a>
+            <a href="Ban_Ban_Ton_Ton.html" class="feed-link">Ver embeds →</a>
+        </div>
+        
+        <div class="feed-card">
+            <h3 class="feed-title">Depósito sonoro</h3>
+            <div class="feed-stats">
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎵</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">📺</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔊</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">páginas</span>
+                </div>
+            </div>
+            
+            <a href="Depósito_sonoro.html" class="feed-link">Ver embeds →</a>
+        </div>
+        
+        <div class="feed-card">
+            <h3 class="feed-title">FW Rare Jazz Vinyl Collector</h3>
+            <div class="feed-stats">
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎵</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">📺</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔊</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">páginas</span>
+                </div>
+            </div>
+            
+            <a href="FW_Rare_Jazz_Vinyl_Collector.html" class="feed-link">Ver embeds →</a>
+        </div>
+        
+        <div class="feed-card">
+            <h3 class="feed-title">Lost Turntable</h3>
+            <div class="feed-stats">
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎵</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">📺</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔊</span>
+                    <span class="stat-number">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">páginas</span>
+                </div>
+            </div>
+            
+            <a href="Lost_Turntable.html" class="feed-link">Ver embeds →</a>
         </div>
         
         </div>
@@ -501,9 +403,11 @@
         </div>
 
         <footer>
-            <p>Generado el 2025-11-05 18:54:33</p>
+            <p>Generado el 2025-10-30 00:11:30</p>
             <p style="margin-top: 10px;">
-                FreshRSS Embed Generator | Tema oscuro #1f1f28
+                <a href="https://github.com/FreshRSS/FreshRSS" target="_blank" style="color: #667eea; text-decoration: none;">
+                    FreshRSS Embed Generator
+                </a>
             </p>
         </footer>
     </div>
