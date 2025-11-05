@@ -1275,8 +1275,8 @@ def main():
                        help='Número máximo de artículos a obtener por feed/categoría (default: 100)')
 
     # Opciones de salida
-    parser.add_argument('--output-dir', default='freshrss_embeds',
-                       help='Directorio de salida para los archivos HTML (default: freshrss_embeds)')
+    parser.add_argument('--output-dir', default='docs',
+                       help='Directorio de salida para los archivos HTML (default: docs)')
     parser.add_argument('--items-per-page', type=int, default=8,
                        help='Número de embeds por página (default: 8)')
     parser.add_argument('--max-pages-buttons', type=int, default=15,

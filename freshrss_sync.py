@@ -7,7 +7,7 @@ Este script lee el browser_data.json exportado desde sync_tools_freshrss.html
 y actualiza los archivos HTML generados para no mostrar los embeds ya escuchados.
 
 USO:
-    python3 freshrss_sync.py --localStorage-file browser_data.json --feed-dir freshrss_embeds
+    python3 freshrss_sync.py --localStorage-file browser_data.json --feed-dir docs
 """
 
 import json
@@ -301,8 +301,8 @@ def main():
     )
     parser.add_argument('--localStorage-file', required=True,
                        help='browser_data.json exportado desde sync_tools_freshrss.html')
-    parser.add_argument('--feed-dir', default='freshrss_embeds',
-                       help='Directorio con los HTMLs de feeds (default: freshrss_embeds)')
+    parser.add_argument('--feed-dir', default='docs',
+                       help='Directorio con los HTMLs de feeds (default: docs)')
     parser.add_argument('--output-dir',
                        help='Directorio de salida (default: sobrescribe los originales)')
     parser.add_argument('--debug', action='store_true',
