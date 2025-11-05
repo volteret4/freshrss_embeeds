@@ -160,7 +160,7 @@ def generate_index_html(feeds, output_dir):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshRSS Embeds - Índice</title>
-    <link rel="icon" type="image/png" href="/images/rss.png">
+    <link rel="icon" type="image/png" href="images/rss.png">
 
     <style>
         * {{
