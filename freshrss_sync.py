@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """
-Script de sincronización para FreshRSS
+Script de sincronización para FreshRSS - VERSIÓN CORREGIDA
 Elimina embeds escuchados que fueron marcados en el navegador
+
+CORRECCIONES APLICADAS:
+1. Recompacta las páginas después de eliminar embeds para evitar páginas vacías
+2. Recalcula la numeración de páginas secuencialmente (1, 2, 3...)
+3. Maneja correctamente el caso donde la primera página queda vacía
+4. Actualiza correctamente el totalPages en el HTML
 
 Este script lee el browser_data.json exportado desde sync_tools_freshrss.html
 y actualiza los archivos HTML generados para no mostrar los embeds ya escuchados.
 
 USO:
-    python3 freshrss_sync.py --localStorage-file browser_data.json --feed-dir docs
+    python3 freshrss_sync_fixed.py --localStorage-file browser_data.json --feed-dir docs
 """
 
 import json
@@ -28,7 +34,7 @@ def load_listened_from_browser(localStorage_file, debug=False):
     print(f"\n📥 Leyendo: {localStorage_file}")
 
     if not os.path.exists(localStorage_file):
-        print(f"✗ No existe: {localStorage_file}")
+        print(f"❌ No existe: {localStorage_file}")
         return {}
 
     try:
@@ -69,43 +75,10 @@ def load_listened_from_browser(localStorage_file, debug=False):
         return listened_by_feed
 
     except Exception as e:
-        print(f"✗ Error: {e}")
+        print(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
         return {}
-
-
-def extract_embed_id_from_html(embed_html):
-    """
-    Extrae el ID de un embed desde su código HTML.
-    Para Bandcamp: album_XXXXXXXX o track_XXXXXXXX
-    Para YouTube/SoundCloud: la URL completa
-    """
-    if not embed_html:
-        return None
-
-    # Buscar album=XXXXXXXX en Bandcamp
-    album_match = re.search(r'album=(\d+)', embed_html)
-    if album_match:
-        return f"album_{album_match.group(1)}"
-
-    # Buscar track=XXXXXXXX en Bandcamp
-    track_match = re.search(r'track=(\d+)', embed_html)
-    if track_match:
-        return f"track_{track_match.group(1)}"
-
-    # Para YouTube
-    yt_match = re.search(r'youtube\.com/embed/([a-zA-Z0-9_-]{11})', embed_html)
-    if yt_match:
-        return f"https://www.youtube.com/embed/{yt_match.group(1)}"
-
-    # Para SoundCloud
-    sc_match = re.search(r'soundcloud\.com/player/\?url=([^&"\']+)', embed_html)
-    if sc_match:
-        from urllib.parse import unquote
-        return unquote(sc_match.group(1))
-
-    return None
 
 
 def scan_feed_htmls(feed_dir, debug=False):
@@ -115,10 +88,10 @@ def scan_feed_htmls(feed_dir, debug=False):
     Returns:
         dict: {feed_name: {'file': filepath, 'embeds': [...], 'total': count}}
     """
-    print(f"\n🔍 Escaneando directorio: {feed_dir}")
+    print(f"\n📁 Escaneando directorio: {feed_dir}")
 
     if not os.path.exists(feed_dir):
-        print(f"✗ El directorio {feed_dir} no existe")
+        print(f"❌ El directorio {feed_dir} no existe")
         return {}
 
     feeds_info = {}
@@ -171,7 +144,7 @@ def scan_feed_htmls(feed_dir, debug=False):
                         print(f"      Ejemplo ID: {item.get('id', 'N/A')}")
 
         except Exception as e:
-            print(f"  ✗ {feed_name}: Error al procesar - {e}")
+            print(f"  ❌ {feed_name}: Error al procesar - {e}")
             if debug:
                 import traceback
                 traceback.print_exc()
@@ -181,26 +154,29 @@ def scan_feed_htmls(feed_dir, debug=False):
 
 def sync_feed(feed_info, listened_ids, debug=False):
     """
-    Elimina los embeds escuchados de los datos de un feed.
+    Elimina los embeds escuchados de los datos de un feed y recompacta las páginas.
+
+    CORRECCIÓN PRINCIPAL: Después de filtrar, recompacta todos los items
+    en páginas secuenciales para evitar páginas vacías.
 
     Returns:
-        dict: Nuevos pages_data filtrados
+        dict: Nuevos pages_data filtrados y recompactados
         dict: Estadísticas de la sincronización
     """
     pages_data = feed_info['pages_data']
-    synced_pages = {}
     stats = {'original': 0, 'kept': 0, 'removed': 0}
 
-    for page_num, items in pages_data.items():
-        filtered_items = []
+    # PASO 1: Recopilar todos los items filtrados en una sola lista
+    all_filtered_items = []
 
+    for page_num, items in pages_data.items():
         for item in items:
             stats['original'] += 1
             item_id = item.get('id')
 
             if not item_id:
                 # Sin ID, mantener por defecto
-                filtered_items.append(item)
+                all_filtered_items.append(item)
                 stats['kept'] += 1
                 if debug:
                     print(f"      ⚠️  Sin ID, manteniendo: {item.get('title', 'Sin título')[:50]}")
@@ -210,16 +186,40 @@ def sync_feed(feed_info, listened_ids, debug=False):
                 # Escuchado → Eliminar
                 stats['removed'] += 1
                 if debug:
-                    print(f"      ✗ Removiendo: {item.get('title', 'Sin título')[:50]}")
+                    print(f"      ❌ Removiendo: {item.get('title', 'Sin título')[:50]}")
                     print(f"         ID: {item_id}")
             else:
                 # No escuchado → Mantener
-                filtered_items.append(item)
+                all_filtered_items.append(item)
                 stats['kept'] += 1
 
-        # Solo guardar la página si tiene items
-        if filtered_items:
-            synced_pages[page_num] = filtered_items
+    # PASO 2: CORRECCIÓN PRINCIPAL - Recompactar en páginas secuenciales
+    # Asumir 8 items por página (valor por defecto del generador)
+    items_per_page = 8
+
+    # Intentar detectar el tamaño de página actual
+    if pages_data:
+        # Usar el tamaño de la primera página como referencia
+        first_page_items = list(pages_data.values())[0]
+        if len(first_page_items) > 0:
+            items_per_page = len(first_page_items)
+
+    synced_pages = {}
+
+    # Dividir todos los items filtrados en páginas nuevas
+    for i in range(0, len(all_filtered_items), items_per_page):
+        page_items = all_filtered_items[i:i + items_per_page]
+        if page_items:  # Solo crear páginas que tengan items
+            page_number = (i // items_per_page) + 1
+            synced_pages[str(page_number)] = page_items
+
+    if debug:
+        print(f"      📊 Recompactación:")
+        print(f"         Items totales filtrados: {len(all_filtered_items)}")
+        print(f"         Items por página: {items_per_page}")
+        print(f"         Páginas resultantes: {len(synced_pages)}")
+        for page_num, items in synced_pages.items():
+            print(f"         Página {page_num}: {len(items)} items")
 
     return synced_pages, stats
 
@@ -227,6 +227,7 @@ def sync_feed(feed_info, listened_ids, debug=False):
 def regenerate_html(feed_name, original_filepath, synced_pages_data, output_dir=None):
     """
     Regenera el archivo HTML con los datos sincronizados.
+    CORRECCIÓN: Actualiza correctamente las estadísticas y totalPages.
     """
     # Leer el HTML original
     with open(original_filepath, 'r', encoding='utf-8') as f:
@@ -247,19 +248,45 @@ def regenerate_html(feed_name, original_filepath, synced_pages_data, output_dir=
         flags=re.DOTALL
     )
 
-    # Reemplazar totalPages
+    # CORRECCIÓN: Reemplazar totalPages correctamente
     html_content = re.sub(
         r'const totalPages = \d+;',
         f'const totalPages = {total_pages};',
         html_content
     )
 
-    # Reemplazar estadísticas en el header
+    # CORRECCIÓN: Reemplazar estadísticas en el header
     html_content = re.sub(
         r'Total: \d+ embeds únicos \| Páginas: \d+',
         f'Total: {total_items} embeds únicos | Páginas: {total_pages}',
         html_content
     )
+
+    # CORRECCIÓN ADICIONAL: Si hay 0 páginas, crear una página vacía para evitar errores de JavaScript
+    if total_pages == 0:
+        empty_pages_data = {"1": []}
+        pages_data_json = json.dumps(empty_pages_data, ensure_ascii=False, indent=2)
+
+        html_content = re.sub(
+            r'const allPagesData = {.+?};',
+            f'const allPagesData = {pages_data_json};',
+            html_content,
+            flags=re.DOTALL
+        )
+
+        html_content = re.sub(
+            r'const totalPages = \d+;',
+            'const totalPages = 1;',
+            html_content
+        )
+
+        html_content = re.sub(
+            r'Total: \d+ embeds únicos \| Páginas: \d+',
+            'Total: 0 embeds únicos | Páginas: 1',
+            html_content
+        )
+
+        print(f"      📝 Creada página vacía para evitar errores JavaScript")
 
     # Guardar
     output_path = original_filepath
@@ -297,7 +324,7 @@ def print_stats(all_stats):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Sincroniza embeds escuchados en FreshRSS HTMLs'
+        description='Sincroniza embeds escuchados en FreshRSS HTMLs (VERSIÓN CORREGIDA)'
     )
     parser.add_argument('--localStorage-file', required=True,
                        help='browser_data.json exportado desde sync_tools_freshrss.html')
@@ -313,20 +340,25 @@ def main():
     args = parser.parse_args()
 
     print("\n" + "="*70)
-    print("🔄 SINCRONIZACIÓN FRESHRSS")
+    print("🔄 SINCRONIZACIÓN FRESHRSS - VERSIÓN CORREGIDA")
     print("="*70)
+    print("🔧 CORRECCIONES APLICADAS:")
+    print("   ✓ Recompactación de páginas para evitar páginas vacías")
+    print("   ✓ Renumeración secuencial de páginas (1, 2, 3...)")
+    print("   ✓ Manejo correcto cuando la primera página queda vacía")
+    print("   ✓ Actualización correcta de totalPages en HTML")
     print("🔑 Usando IDs de embeds como identificador")
 
     # Cargar localStorage
     listened = load_listened_from_browser(args.localStorage_file, debug=args.debug)
     if not listened:
-        print("\n✗ No hay datos de escuchados")
+        print("\n❌ No hay datos de escuchados")
         return
 
     # Escanear feeds
     feeds_info = scan_feed_htmls(args.feed_dir, debug=args.debug)
     if not feeds_info:
-        print("\n✗ No hay feeds para sincronizar")
+        print("\n❌ No hay feeds para sincronizar")
         return
 
     # Crear directorio de salida si se especificó
@@ -364,7 +396,11 @@ def main():
         synced_pages, stats = sync_feed(feed_info, listened_ids, debug=args.debug)
         all_stats[feed_name] = stats
 
+        original_pages = len(feed_info['pages_data'])
+        new_pages = len(synced_pages)
+
         print(f"  {feed_name}: {stats['original']} → {stats['kept']} (-{stats['removed']})")
+        print(f"    Páginas: {original_pages} → {new_pages}")
 
         # Regenerar HTML si no es solo stats
         if not args.stats_only:
@@ -394,7 +430,7 @@ def main():
     print("="*70)
 
     if not args.stats_only:
-        print(f"\n📝 Próximos pasos:")
+        print(f"\n🔍 Próximos pasos:")
         print(f"   1. Verifica los HTMLs en: {args.output_dir or args.feed_dir}")
         print(f"   2. Abre los feeds en tu navegador para comprobar los cambios")
         print(f"   3. Si todo está bien, sube los cambios:")

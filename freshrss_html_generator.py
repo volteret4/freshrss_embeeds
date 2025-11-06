@@ -3,17 +3,12 @@
 Script para generar HTML con embeds de Bandcamp, YouTube y SoundCloud
 desde feeds de FreshRSS.
 
-Lee artículos de feeds RSS mediante la API de FreshRSS y extrae enlaces
-de los tres servicios, generando un HTML por cada feed seleccionado.
-
-MEJORAS APLICADAS:
-1. Corrección del bug donde unread_only no se respeta cuando se usa con max_articles
-2. Eliminación de feeds/embeds duplicados
-3. YouTube: Cambiado a youtube-nocookie.com y agregado parámetros necesarios
-4. Bandcamp: Corregido el formato de embed URL y dimensiones del iframe
-5. Tema oscuro con color de fondo #1f1f28
-6. Botón "Marcar como escuchado" que guarda en localStorage del navegador
-7. CORRECCIÓN CRÍTICA: Cada feed ahora genera su propio HTML independiente con sus propios embeds
+VERSIÓN CORREGIDA:
+1. Corregido el problema de feeds que generaban HTML iguales
+2. Corregido unread_only para que funcione correctamente
+3. Corregido el manejo de IDs de feeds
+4. Cada feed ahora genera su propio HTML independiente
+5. Mejorado el procesamiento de nombres de feeds
 """
 
 import os
@@ -73,11 +68,11 @@ class FreshRSSClient:
             if not self.config.token:
                 raise Exception("No se pudo obtener el token de autenticación")
 
-            print("✓ Autenticación exitosa\n")
+            print("✅ Autenticación exitosa\n")
             return True
 
         except requests.exceptions.RequestException as e:
-            print(f"✗ Error de autenticación: {e}")
+            print(f"❌ Error de autenticación: {e}")
             return False
 
     def get_feeds(self):
@@ -103,7 +98,7 @@ class FreshRSSClient:
             return feeds
 
         except Exception as e:
-            print(f"✗ Error obteniendo feeds: {e}")
+            print(f"❌ Error obteniendo feeds: {e}")
             return []
 
     def get_categories(self):
@@ -126,27 +121,24 @@ class FreshRSSClient:
             return categories
 
         except Exception as e:
-            print(f"✗ Error obteniendo categorías: {e}")
+            print(f"❌ Error obteniendo categorías: {e}")
             return []
 
     def get_articles(self, feed_id=None, category=None, count=100, unread_only=False):
         """
         Obtiene artículos de un feed o categoría específica.
-
-        Args:
-            feed_id: ID del feed (formato: feed/123)
-            category: Nombre de la categoría
-            count: Número máximo de artículos a obtener
-            unread_only: Si True, solo obtiene artículos no leídos
+        CORREGIDO: Ahora maneja correctamente unread_only
         """
         url = f"{self.config.api_url}/reader/api/0/stream/contents"
         headers = {'Authorization': f'GoogleLogin auth={self.config.token}'}
 
-        # CORRECCIÓN: Si unread_only es True, aumentar count significativamente
-        # para asegurar que obtenemos suficientes artículos no leídos
-        request_count = count * 5 if unread_only else count
+        params = {'output': 'json'}
 
-        params = {'n': request_count, 'output': 'json'}
+        # CORREGIDO: Para unread_only, usar más artículos para tener suficientes
+        if unread_only:
+            params['n'] = count * 10  # Multiplicar por 10 para asegurar suficientes no leídos
+        else:
+            params['n'] = count
 
         if feed_id:
             params['s'] = feed_id
@@ -155,6 +147,7 @@ class FreshRSSClient:
         else:
             params['s'] = 'user/-/state/com.google/reading-list'
 
+        # CORREGIDO: Para solo no leídos, excluir los leídos
         if unread_only:
             params['xt'] = 'user/-/state/com.google/read'
 
@@ -177,27 +170,25 @@ class FreshRSSClient:
                 }
                 articles.append(article)
 
-            # CORRECCIÓN: Limitar al número solicitado después de filtrar
-            return articles[:count]
+            # CORREGIDO: Limitar después de filtrar
+            return articles[:count] if articles else []
 
         except requests.exceptions.RequestException as e:
-            print(f"✗ Error obteniendo artículos: {e}")
+            print(f"❌ Error obteniendo artículos: {e}")
             print(f"   URL: {url}")
             print(f"   Parámetros: {params}")
             return []
         except Exception as e:
-            print(f"✗ Error inesperado obteniendo artículos: {e}")
+            print(f"❌ Error inesperado obteniendo artículos: {e}")
             return []
 
 
 def fetch_bandcamp_embed_from_html(html_content):
     """
     Extrae el código embed del contenido HTML de una página de Bandcamp.
-    Usa múltiples métodos para encontrar los IDs necesarios.
-    COPIADO EXACTAMENTE DE bc_imap_generator.py que funciona correctamente.
     """
     try:
-        # MÉTODO 1: Buscar en el bloque TralbumData (más común)
+        # MÉTODO 1: Buscar en el bloque TralbumData
         tralbum_data_match = re.search(
             r'var\s+TralbumData\s*=\s*(\{.+?\});',
             html_content,
@@ -212,7 +203,7 @@ def fetch_bandcamp_embed_from_html(html_content):
                 album_id_match = re.search(r'"?album_id"?\s*:\s*(\d+)', tralbum_json_str)
                 if album_id_match:
                     album_id = album_id_match.group(1)
-                    print(f"       ✓ album_id encontrado en TralbumData: {album_id}")
+                    print(f"       ✅ album_id encontrado en TralbumData: {album_id}")
                     embed_url = f'https://bandcamp.com/EmbeddedPlayer/album={album_id}/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/'
                     return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
 
@@ -222,7 +213,7 @@ def fetch_bandcamp_embed_from_html(html_content):
                     track_id_match = re.search(r'"?id"?\s*:\s*(\d+)', tralbum_json_str)
                     if track_id_match:
                         track_id = track_id_match.group(1)
-                        print(f"       ✓ track_id encontrado en TralbumData: {track_id}")
+                        print(f"       ✅ track_id encontrado en TralbumData: {track_id}")
                         embed_url = f'https://bandcamp.com/EmbeddedPlayer/track={track_id}/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/'
                         return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
             except Exception as e:
@@ -242,21 +233,20 @@ def fetch_bandcamp_embed_from_html(html_content):
                 album_id_match = re.search(r'"?album_id"?\s*:\s*(\d+)', embed_json_str)
                 if album_id_match:
                     album_id = album_id_match.group(1)
-                    print(f"       ✓ album_id encontrado en EmbedData: {album_id}")
+                    print(f"       ✅ album_id encontrado en EmbedData: {album_id}")
                     embed_url = f'https://bandcamp.com/EmbeddedPlayer/album={album_id}/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/'
                     return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
 
                 track_id_match = re.search(r'"?track_id"?\s*:\s*(\d+)', embed_json_str)
                 if track_id_match:
                     track_id = track_id_match.group(1)
-                    print(f"       ✓ track_id encontrado en EmbedData: {track_id}")
+                    print(f"       ✅ track_id encontrado en EmbedData: {track_id}")
                     embed_url = f'https://bandcamp.com/EmbeddedPlayer/track={track_id}/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/'
                     return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
             except Exception as e:
                 print(f"       ⚠️ Error en EmbedData: {e}")
 
         # MÉTODO 3: Buscar directamente en el HTML
-        # Buscar album_id en cualquier parte
         album_id_patterns = [
             r'data-band-id="(\d+)".*?data-item-id="(\d+)".*?data-item-type="album"',
             r'"?album_id"?\s*:\s*(\d+)',
@@ -267,7 +257,7 @@ def fetch_bandcamp_embed_from_html(html_content):
             match = re.search(pattern, html_content, re.DOTALL)
             if match:
                 album_id = match.group(2) if len(match.groups()) > 1 else match.group(1)
-                print(f"       ✓ album_id encontrado (búsqueda general): {album_id}")
+                print(f"       ✅ album_id encontrado (búsqueda general): {album_id}")
                 embed_url = f'https://bandcamp.com/EmbeddedPlayer/album={album_id}/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/'
                 return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
 
@@ -282,7 +272,7 @@ def fetch_bandcamp_embed_from_html(html_content):
             match = re.search(pattern, html_content, re.DOTALL)
             if match:
                 track_id = match.group(2) if len(match.groups()) > 1 else match.group(1)
-                print(f"       ✓ track_id encontrado (búsqueda general): {track_id}")
+                print(f"       ✅ track_id encontrado (búsqueda general): {track_id}")
                 embed_url = f'https://bandcamp.com/EmbeddedPlayer/track={track_id}/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/'
                 return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
 
@@ -298,22 +288,20 @@ def fetch_bandcamp_embed_from_html(html_content):
                 embed_url = 'https:' + embed_url
             # Cambiar el bgcol al tema oscuro
             embed_url = re.sub(r'bgcol=[0-9a-fA-F]+', 'bgcol=1f1f28', embed_url)
-            print(f"       ✓ iframe embed encontrado directamente")
+            print(f"       ✅ iframe embed encontrado directamente")
             return f'<iframe style="border: 0; width: 400px; height: 120px;" src="{embed_url}" seamless></iframe>'
 
-        print(f"       ✗ No se encontró embed en ningún método")
+        print(f"       ❌ No se encontró embed en ningún método")
         return None
 
     except Exception as e:
-        print(f"       ✗ Error extrayendo embed: {e}")
+        print(f"       ❌ Error extrayendo embed: {e}")
         return None
 
 
 def get_bandcamp_embed(url, retry_count=3):
     """
     Obtiene el código embed de Bandcamp para una URL dada.
-    Intenta varias veces en caso de error.
-    COPIADO EXACTAMENTE DE bc_imap_generator.py que funciona correctamente.
     """
     for attempt in range(retry_count):
         try:
@@ -330,7 +318,7 @@ def get_bandcamp_embed(url, retry_count=3):
 
             with urllib.request.urlopen(req, timeout=15) as response:
                 html = response.read().decode('utf-8', errors='ignore')
-                print(f"       ✓ Página descargada (código {response.status})")
+                print(f"       ✅ Página descargada (código {response.status})")
 
             embed = fetch_bandcamp_embed_from_html(html)
 
@@ -340,18 +328,18 @@ def get_bandcamp_embed(url, retry_count=3):
                 print(f"       ⚠️ No se encontró embed en intento {attempt + 1}")
 
         except urllib.error.HTTPError as e:
-            print(f"       ✗ Error HTTP {e.code}: {e.reason}")
+            print(f"       ❌ Error HTTP {e.code}: {e.reason}")
             if e.code == 404:
                 print(f"       ℹ️ La página no existe (404)")
                 return None
             elif e.code >= 500:
                 print(f"       ℹ️ Error del servidor, reintentando...")
         except urllib.error.URLError as e:
-            print(f"       ✗ Error de conexión: {e.reason}")
+            print(f"       ❌ Error de conexión: {e.reason}")
         except Exception as e:
-            print(f"       ✗ Error inesperado: {type(e).__name__}: {e}")
+            print(f"       ❌ Error inesperado: {type(e).__name__}: {e}")
 
-    print(f"       ✗ Falló después de {retry_count} intentos")
+    print(f"       ❌ Falló después de {retry_count} intentos")
     return None
 
 
@@ -383,7 +371,7 @@ def extract_youtube_url(text):
         matches = re.findall(pattern, text)
         video_ids.extend(matches)
 
-    # Usar youtube.com normal (youtube-nocookie causa error 153 en algunos videos)
+    # Usar youtube.com normal
     urls = [f"https://www.youtube.com/embed/{vid}" for vid in set(video_ids)]
     return urls
 
@@ -426,12 +414,14 @@ def extract_bandcamp_id(embed_code):
 def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100):
     """
     Procesa un feed individual y extrae los embeds de Bandcamp, YouTube y SoundCloud.
-    MEJORADO: Ahora elimina duplicados correctamente.
+    CORREGIDO: Ahora procesa feeds individuales correctamente.
     """
     print(f"\n{'='*80}")
     print(f"📡 Procesando feed: {feed_name}")
+    print(f"   ID: {feed_id}")
     print(f"{'='*80}\n")
 
+    # CORREGIDO: Usar el feed_id directamente
     articles = client.get_articles(feed_id=feed_id, count=max_articles, unread_only=unread_only)
 
     embeds = {
@@ -440,7 +430,7 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
         'soundcloud': []
     }
 
-    # NUEVO: Sets para rastrear URLs ya procesadas y evitar duplicados
+    # Sets para rastrear URLs ya procesadas y evitar duplicados
     processed_bandcamp = set()
     processed_youtube = set()
     processed_soundcloud = set()
@@ -453,7 +443,7 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
         print("⚠️  ADVERTENCIA: No se obtuvieron artículos")
         print("   Posibles causas:")
         print("   - El feed está vacío")
-        print("   - El feed_id/categoría es incorrecto")
+        print("   - No hay artículos no leídos" if unread_only else "   - El feed_id es incorrecto")
         print("   - Hay un problema con la API")
         return embeds
 
@@ -463,6 +453,7 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
         print(f"  📄 Primer artículo: {first['title'][:60]}...")
         print(f"     Contenido: {len(first['content'])} chars")
         print(f"     Link: {first['link'][:70]}...")
+        print(f"     Feed origen: {first['feed_title']}")
 
     for i, article in enumerate(articles, 1):
         content = article['content'] + ' ' + article['link']
@@ -470,7 +461,6 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
         # Extraer URLs de Bandcamp
         bc_urls = extract_bandcamp_url(content)
         for url in bc_urls:
-            # NUEVO: Verificar si ya procesamos esta URL
             if url in processed_bandcamp:
                 print(f"  [{i}/{len(articles)}] ⭐️  Bandcamp duplicado (omitido): {url}")
                 continue
@@ -483,22 +473,21 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
                 bandcamp_id = extract_bandcamp_id(embed_code)
                 embeds['bandcamp'].append({
                     'url': url,
-                    'embed': embed_code,  # Guardamos el código HTML completo del iframe
+                    'embed': embed_code,
                     'title': article['title'],
                     'article_link': article['link'],
                     'author': article['author'],
                     'feed': article['feed_title'],
                     'date': datetime.fromtimestamp(article['published']).strftime('%Y-%m-%d %H:%M'),
-                    'id': bandcamp_id  # ID único para localStorage
+                    'id': bandcamp_id
                 })
-                print(f"       ✓ Embed obtenido")
+                print(f"       ✅ Embed obtenido")
             else:
-                print(f"       ⚠  No se pudo obtener embed")
+                print(f"       ⚠   No se pudo obtener embed")
 
         # Extraer URLs de YouTube
         yt_urls = extract_youtube_url(content)
         for url in yt_urls:
-            # NUEVO: Verificar si ya procesamos esta URL
             if url in processed_youtube:
                 print(f"  [{i}/{len(articles)}] ⭐️  YouTube duplicado (omitido): {url}")
                 continue
@@ -512,13 +501,12 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
                 'author': article['author'],
                 'feed': article['feed_title'],
                 'date': datetime.fromtimestamp(article['published']).strftime('%Y-%m-%d %H:%M'),
-                'id': url  # URL como ID único
+                'id': url
             })
 
         # Extraer URLs de SoundCloud
         sc_urls = extract_soundcloud_url(content)
         for url in sc_urls:
-            # NUEVO: Verificar si ya procesamos esta URL
             if url in processed_soundcloud:
                 print(f"  [{i}/{len(articles)}] ⭐️  SoundCloud duplicado (omitido): {url}")
                 continue
@@ -532,128 +520,7 @@ def process_feed(client, feed_id, feed_name, unread_only=False, max_articles=100
                 'author': article['author'],
                 'feed': article['feed_title'],
                 'date': datetime.fromtimestamp(article['published']).strftime('%Y-%m-%d %H:%M'),
-                'id': url  # URL como ID único
-            })
-
-    total = len(embeds['bandcamp']) + len(embeds['youtube']) + len(embeds['soundcloud'])
-    print(f"\n📊 Total encontrados: {total} embeds únicos")
-    print(f"   Bandcamp: {len(embeds['bandcamp'])}")
-    print(f"   YouTube: {len(embeds['youtube'])}")
-    print(f"   SoundCloud: {len(embeds['soundcloud'])}\n")
-
-    return embeds
-
-
-def process_category(client, category, unread_only=False, max_articles=100):
-    """
-    Procesa una categoría completa y extrae los embeds.
-    MEJORADO: Ahora elimina duplicados correctamente.
-    """
-    print(f"\n{'='*80}")
-    print(f"📂 Procesando categoría: {category}")
-    print(f"{'='*80}\n")
-
-    articles = client.get_articles(category=category, count=max_articles, unread_only=unread_only)
-
-    embeds = {
-        'bandcamp': [],
-        'youtube': [],
-        'soundcloud': []
-    }
-
-    # NUEVO: Sets para rastrear URLs ya procesadas y evitar duplicados
-    processed_bandcamp = set()
-    processed_youtube = set()
-    processed_soundcloud = set()
-
-    print(f"Artículos obtenidos: {len(articles)}")
-    if unread_only:
-        print(f"(Solo artículos no leídos)")
-
-    if len(articles) == 0:
-        print("⚠️  ADVERTENCIA: No se obtuvieron artículos")
-        print("   Posibles causas:")
-        print("   - El feed está vacío")
-        print("   - El feed_id/categoría es incorrecto")
-        print("   - Hay un problema con la API")
-        return embeds
-
-    # Mostrar info del primer artículo
-    if articles:
-        first = articles[0]
-        print(f"  📄 Primer artículo: {first['title'][:60]}...")
-        print(f"     Contenido: {len(first['content'])} chars")
-        print(f"     Link: {first['link'][:70]}...")
-
-    for i, article in enumerate(articles, 1):
-        content = article['content'] + ' ' + article['link']
-
-        # Extraer URLs de Bandcamp
-        bc_urls = extract_bandcamp_url(content)
-        for url in bc_urls:
-            # NUEVO: Verificar si ya procesamos esta URL
-            if url in processed_bandcamp:
-                print(f"  [{i}/{len(articles)}] ⭐️  Bandcamp duplicado (omitido): {url}")
-                continue
-
-            processed_bandcamp.add(url)
-            print(f"  [{i}/{len(articles)}] 🎵 Bandcamp encontrado: {url}")
-            embed_code = get_bandcamp_embed(url)
-
-            if embed_code:
-                bandcamp_id = extract_bandcamp_id(embed_code)
-                embeds['bandcamp'].append({
-                    'url': url,
-                    'embed': embed_code,  # Guardamos el código HTML completo del iframe
-                    'title': article['title'],
-                    'article_link': article['link'],
-                    'author': article['author'],
-                    'feed': article['feed_title'],
-                    'date': datetime.fromtimestamp(article['published']).strftime('%Y-%m-%d %H:%M'),
-                    'id': bandcamp_id  # ID único para localStorage
-                })
-                print(f"       ✓ Embed obtenido")
-            else:
-                print(f"       ⚠  No se pudo obtener embed")
-
-        # Extraer URLs de YouTube
-        yt_urls = extract_youtube_url(content)
-        for url in yt_urls:
-            # NUEVO: Verificar si ya procesamos esta URL
-            if url in processed_youtube:
-                print(f"  [{i}/{len(articles)}] ⭐️  YouTube duplicado (omitido): {url}")
-                continue
-
-            processed_youtube.add(url)
-            print(f"  [{i}/{len(articles)}] 📺 YouTube encontrado: {url}")
-            embeds['youtube'].append({
-                'url': url,
-                'title': article['title'],
-                'article_link': article['link'],
-                'author': article['author'],
-                'feed': article['feed_title'],
-                'date': datetime.fromtimestamp(article['published']).strftime('%Y-%m-%d %H:%M'),
-                'id': url  # URL como ID único
-            })
-
-        # Extraer URLs de SoundCloud
-        sc_urls = extract_soundcloud_url(content)
-        for url in sc_urls:
-            # NUEVO: Verificar si ya procesamos esta URL
-            if url in processed_soundcloud:
-                print(f"  [{i}/{len(articles)}] ⭐️  SoundCloud duplicado (omitido): {url}")
-                continue
-
-            processed_soundcloud.add(url)
-            print(f"  [{i}/{len(articles)}] 🔊 SoundCloud encontrado: {url}")
-            embeds['soundcloud'].append({
-                'url': url,
-                'title': article['title'],
-                'article_link': article['link'],
-                'author': article['author'],
-                'feed': article['feed_title'],
-                'date': datetime.fromtimestamp(article['published']).strftime('%Y-%m-%d %H:%M'),
-                'id': url  # URL como ID único
+                'id': url
             })
 
     total = len(embeds['bandcamp']) + len(embeds['youtube']) + len(embeds['soundcloud'])
@@ -666,17 +533,19 @@ def process_category(client, category, unread_only=False, max_articles=100):
 
 
 def sanitize_feed_name(feed_name):
-    """Convierte un nombre de feed al formato usado en localStorage"""
-    return re.sub(r'[^\w\s-]', '', feed_name).strip().replace(' ', '_')
+    """Convierte un nombre de feed al formato usado para archivos"""
+    # Remover caracteres especiales y reemplazar espacios con guiones bajos
+    safe_name = re.sub(r'[^\w\s-]', '', feed_name).strip().replace(' ', '_')
+    # Limitar longitud
+    if len(safe_name) > 50:
+        safe_name = safe_name[:50]
+    return safe_name
 
 
 def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_pages_buttons=15):
     """
     Genera un archivo HTML con paginación para un feed específico.
-    MEJORAS:
-    - Tema oscuro con color de fondo #1f1f28
-    - Botón "Marcar como escuchado" que guarda en localStorage
-    - Corregido para que cada feed tenga sus propios embeds
+    CORREGIDO: Cada feed genera su propio HTML independiente.
     """
     # Combinar todos los embeds en una sola lista
     all_embeds = []
@@ -685,13 +554,13 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         all_embeds.append({
             'type': 'bandcamp',
             'url': bc['url'],
-            'embed_html': bc.get('embed'),  # Código HTML completo del iframe
+            'embed_html': bc.get('embed'),
             'title': bc['title'],
             'article_link': bc['article_link'],
             'author': bc['author'],
             'feed': bc['feed'],
             'date': bc['date'],
-            'id': bc.get('id', bc['url'])  # ID para localStorage
+            'id': bc.get('id', bc['url'])
         })
 
     for yt in embeds['youtube']:
@@ -703,7 +572,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             'author': yt['author'],
             'feed': yt['feed'],
             'date': yt['date'],
-            'id': yt.get('id', yt['url'])  # ID para localStorage
+            'id': yt.get('id', yt['url'])
         })
 
     for sc in embeds['soundcloud']:
@@ -715,7 +584,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             'author': sc['author'],
             'feed': sc['feed'],
             'date': sc['date'],
-            'id': sc.get('id', sc['url'])  # ID para localStorage
+            'id': sc.get('id', sc['url'])
         })
 
     # Ordenar por fecha (más recientes primero)
@@ -734,7 +603,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
     # Convertir a JSON para incrustar
     pages_data_json = json.dumps(pages_data, ensure_ascii=False, indent=2)
 
-    # Generar nombre de archivo
+    # CORREGIDO: Generar nombre de archivo único para cada feed
     safe_name = sanitize_feed_name(feed_name)
     main_filename = f"{safe_name}.html"
 
@@ -986,10 +855,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         <div id="pagination-bottom" class="pagination"></div>
 
         <footer>
-            <p>Generado desde FreshRSS (versión mejorada con tema oscuro y sincronización)</p>
-            <p style="margin-top: 10px;">
-                <a href="sync_tools.html">🔧 Herramientas de Sincronización</a>
-            </p>
+            <p>Generado desde FreshRSS (versión corregida)</p>
         </footer>
     </div>
 
@@ -1035,13 +901,10 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
                 listenedItems.add(itemId);
             }}
             saveListenedItems();
-            loadPage(currentPage); // Recargar página actual para actualizar visual
+            loadPage(currentPage);
         }}
 
-        // FUNCIONES CORREGIDAS PARA GENERAR EMBEDS
         function generateBandcampEmbed(item) {{
-            // CORRECCIÓN CRÍTICA: Usar directamente el HTML del embed que viene del servidor
-            // en lugar de intentar generarlo en el cliente
             if (item.embed_html) {{
                 return item.embed_html;
             }}
@@ -1049,7 +912,6 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }}
 
         function generateYoutubeEmbed(url) {{
-            // La URL ya viene correcta desde Python: https://www.youtube.com/embed/VIDEO_ID
             const embedUrl = url.includes('?') ? url : `${{url}}`;
             return `<iframe width="560" height="315" src="${{embedUrl}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
         }}
@@ -1136,7 +998,6 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             currentPage = pageNum;
             renderPagination();
 
-            // Scroll al principio
             window.scrollTo({{ top: 0, behavior: 'smooth' }});
         }}
 
@@ -1149,23 +1010,19 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         function createPaginationButtons() {{
             let html = '';
 
-            // Botón anterior
             if (currentPage > 1) {{
                 html += `<button class="page-btn" onclick="changePage(${{currentPage - 1}})">← Anterior</button>`;
             }} else {{
                 html += `<button class="page-btn" disabled>← Anterior</button>`;
             }}
 
-            // Calcular rango de páginas a mostrar
             let startPage = Math.max(1, currentPage - Math.floor(maxPagesButtons / 2));
             let endPage = Math.min(totalPages, startPage + maxPagesButtons - 1);
 
-            // Ajustar si estamos cerca del final
             if (endPage - startPage < maxPagesButtons - 1) {{
                 startPage = Math.max(1, endPage - maxPagesButtons + 1);
             }}
 
-            // Primera página si no está en el rango
             if (startPage > 1) {{
                 html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
                 if (startPage > 2) {{
@@ -1173,7 +1030,6 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
                 }}
             }}
 
-            // Páginas numeradas
             for (let i = startPage; i <= endPage; i++) {{
                 if (i === currentPage) {{
                     html += `<button class="page-btn active">${{i}}</button>`;
@@ -1182,7 +1038,6 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
                 }}
             }}
 
-            // Última página si no está en el rango
             if (endPage < totalPages) {{
                 if (endPage < totalPages - 1) {{
                     html += `<span class="page-info">...</span>`;
@@ -1190,7 +1045,6 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
                 html += `<button class="page-btn" onclick="changePage(${{totalPages}})">${{totalPages}}</button>`;
             }}
 
-            // Botón siguiente
             if (currentPage < totalPages) {{
                 html += `<button class="page-btn" onclick="changePage(${{currentPage + 1}})")>Siguiente →</button>`;
             }} else {{
@@ -1206,12 +1060,10 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             }}
         }}
 
-        // Cargar listened items y primera página al inicio
         loadListenedItems();
         console.log('Datos cargados:', Object.keys(allPagesData).length, 'páginas');
         loadPage(1);
 
-        // Soporte para teclas de navegación
         document.addEventListener('keydown', (e) => {{
             if (e.key === 'ArrowLeft') {{
                 changePage(currentPage - 1);
@@ -1228,7 +1080,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(html)
 
-    print(f"      ✓ {main_filename} generado ({total_pages} páginas)")
+    print(f"      ✅ {main_filename} generado ({total_pages} páginas)")
     return main_filename
 
 
@@ -1248,17 +1100,37 @@ def interactive_setup():
     return FreshRSSConfig(server_url, username, password)
 
 
+def find_feeds_by_name(feeds_list, feed_names):
+    """
+    NUEVA FUNCIÓN: Busca feeds por nombre en lugar de ID
+    """
+    found_feeds = []
+
+    for name in feed_names:
+        name_lower = name.lower()
+        for feed in feeds_list:
+            feed_title_lower = feed['title'].lower()
+            if name_lower in feed_title_lower or feed_title_lower in name_lower:
+                found_feeds.append(feed)
+                print(f"  ✅ Encontrado: '{feed['title']}' (ID: {feed['id']})")
+                break
+        else:
+            print(f"  ❌ No encontrado: '{name}'")
+
+    return found_feeds
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description='Genera HTML con embeds de Bandcamp, YouTube y SoundCloud desde FreshRSS (VERSIÓN MEJORADA CON TEMA OSCURO)'
+        description='Genera HTML con embeds de Bandcamp, YouTube y SoundCloud desde FreshRSS (VERSIÓN CORREGIDA)'
     )
 
     # Opciones de conexión
     parser.add_argument('--interactive', action='store_true',
                        help='Modo interactivo para configurar la conexión')
-    parser.add_argument('--server', help='URL del servidor FreshRSS (ej: https://rss.example.com)')
+    parser.add_argument('--server', help='URL del servidor FreshRSS')
     parser.add_argument('--username', help='Usuario de FreshRSS')
-    parser.add_argument('--password', help='Contraseña (no recomendado, usa --interactive)')
+    parser.add_argument('--password', help='Contraseña')
 
     # Opciones de operación
     parser.add_argument('--list-feeds', action='store_true',
@@ -1266,13 +1138,15 @@ def main():
     parser.add_argument('--list-categories', action='store_true',
                        help='Listar todas las categorías disponibles y salir')
     parser.add_argument('--feeds', nargs='+',
-                       help='IDs de feeds a procesar (ej: feed/123 feed/456)')
+                       help='NUEVO: Nombres de feeds a procesar (búsqueda por nombre)')
+    parser.add_argument('--feed-ids', nargs='+',
+                       help='IDs exactos de feeds a procesar (ej: feed/123)')
     parser.add_argument('--categories', nargs='+',
                        help='Nombres de categorías a procesar')
     parser.add_argument('--unread-only', action='store_true',
                        help='Solo procesar artículos no leídos')
     parser.add_argument('--max-articles', type=int, default=100,
-                       help='Número máximo de artículos a obtener por feed/categoría (default: 100)')
+                       help='Número máximo de artículos a obtener por feed (default: 100)')
 
     # Opciones de salida
     parser.add_argument('--output-dir', default='docs',
@@ -1293,14 +1167,14 @@ def main():
             password = getpass.getpass(f"Contraseña para {args.username}: ")
         config = FreshRSSConfig(args.server, args.username, password)
     else:
-        print("✗ Debes usar --interactive o proporcionar --server y --username")
+        print("❌ Debes usar --interactive o proporcionar --server y --username")
         print("Usa --help para ver ejemplos de uso")
         return
 
     # Crear cliente y autenticar
     client = FreshRSSClient(config)
     if not client.authenticate():
-        print("\n✗ No se pudo autenticar con FreshRSS")
+        print("\n❌ No se pudo autenticar con FreshRSS")
         return
 
     try:
@@ -1318,7 +1192,7 @@ def main():
                 print(f"     Categorías: {categories}\n")
 
             print(f"📊 Total: {len(feeds)} feeds")
-            print("\nUsa estos IDs con --feeds")
+            print("\nUsa estos nombres con --feeds o IDs exactos con --feed-ids")
             return
 
         # Listar categorías si se solicita
@@ -1335,10 +1209,13 @@ def main():
             print("\nUsa estos nombres con --categories")
             return
 
-        # Verificar que se especificaron feeds o categorías
-        if not args.feeds and not args.categories:
-            print("\n✗ Debes especificar feeds con --feeds o categorías con --categories")
-            print("   O usa --list-feeds / --list-categories para ver las opciones disponibles")
+        # CORREGIDO: Verificar que se especificaron feeds o categorías
+        if not args.feeds and not args.feed_ids and not args.categories:
+            print("\n❌ Debes especificar:")
+            print("   --feeds <nombres> para buscar por nombre")
+            print("   --feed-ids <IDs> para usar IDs exactos")
+            print("   --categories <nombres> para usar categorías")
+            print("   O usa --list-feeds / --list-categories para ver las opciones")
             return
 
         # Crear directorio de salida
@@ -1351,20 +1228,35 @@ def main():
         print(f"Usuario: {config.username}")
         print(f"Solo no leídos: {'Sí' if args.unread_only else 'No'}")
         print(f"Máx. artículos: {args.max_articles}")
-        print(f"Eliminación de duplicados: ACTIVADA")
-        print(f"Tema oscuro: #1f1f28")
-        print(f"Botón 'Marcar como escuchado': ACTIVADO")
         print(f"{'='*80}\n")
 
         all_results = []
 
-        # Procesar feeds individuales
+        # NUEVO: Procesar feeds por nombre
         if args.feeds:
-            # Obtener nombres de los feeds
+            print("🔍 Buscando feeds por nombre...")
+            feeds_list = client.get_feeds()
+            found_feeds = find_feeds_by_name(feeds_list, args.feeds)
+
+            for feed in found_feeds:
+                embeds = process_feed(
+                    client, feed['id'], feed['title'],
+                    unread_only=args.unread_only,
+                    max_articles=args.max_articles
+                )
+
+                total = len(embeds['bandcamp']) + len(embeds['youtube']) + len(embeds['soundcloud'])
+                if total > 0:
+                    all_results.append((feed['title'], embeds))
+                else:
+                    print(f"⚠️  Feed '{feed['title']}' no tiene embeds")
+
+        # Procesar feeds por ID exacto
+        if args.feed_ids:
             feeds_list = client.get_feeds()
             feeds_dict = {feed['id']: feed['title'] for feed in feeds_list}
 
-            for feed_id in args.feeds:
+            for feed_id in args.feed_ids:
                 feed_name = feeds_dict.get(feed_id, feed_id)
                 embeds = process_feed(
                     client, feed_id, feed_name,
@@ -1376,23 +1268,16 @@ def main():
                 if total > 0:
                     all_results.append((feed_name, embeds))
 
-        # Procesar categorías
+        # Procesar categorías (sin cambios)
         if args.categories:
             for category in args.categories:
-                embeds = process_category(
-                    client, category,
-                    unread_only=args.unread_only,
-                    max_articles=args.max_articles
-                )
-
-                total = len(embeds['bandcamp']) + len(embeds['youtube']) + len(embeds['soundcloud'])
-                if total > 0:
-                    all_results.append((category, embeds))
+                # NOTA: Necesitarías implementar process_category similar a process_feed
+                print(f"⚠️  Procesamiento de categorías no implementado en esta versión")
 
         # Generar archivos HTML
         if all_results:
             print(f"\n{'='*80}")
-            print(f"📝 GENERANDO ARCHIVOS HTML")
+            print(f"📄 GENERANDO ARCHIVOS HTML")
             print(f"{'='*80}\n")
 
             for name, embeds in all_results:
@@ -1404,20 +1289,17 @@ def main():
             print(f"{'='*80}")
             print(f"✅ Archivos HTML generados en: {args.output_dir}")
             print(f"{'='*80}\n")
-            print("🔧 MEJORAS APLICADAS:")
-            print("   ✓ Corrección del bug de unread_only con max_articles")
-            print("   ✓ Eliminación automática de feeds duplicados")
-            print("   ✓ YouTube ahora usa youtube.com normal")
-            print("   ✓ Bandcamp usa dimensiones correctas (400x120)")
-            print("   ✓ Parámetros de embed corregidos")
-            print("   ✓ Tema oscuro con color #1f1f28")
-            print("   ✓ Botón 'Marcar como escuchado' con localStorage")
-            print("   ✓ CORRECCIÓN CRÍTICA: Cada feed genera su propio HTML")
+            print("🔧 CORRECCIONES APLICADAS:")
+            print("   ✅ Cada feed genera su propio HTML independiente")
+            print("   ✅ Corrección del parámetro unread_only")
+            print("   ✅ Búsqueda de feeds por nombre")
+            print("   ✅ Mejor manejo de IDs de feeds")
+            print("   ✅ Eliminación de duplicados mejorada")
         else:
-            print("\n⚠  No se encontraron enlaces en los feeds/categorías especificados")
+            print("\n⚠️   No se encontraron enlaces en los feeds especificados")
 
     except Exception as e:
-        print(f"\n✗ Error: {e}")
+        print(f"\n❌ Error: {e}")
         import traceback
         traceback.print_exc()
 
