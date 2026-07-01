@@ -161,8 +161,23 @@ def generate_index_html(feeds, output_dir):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshRSS Embeds - Índice</title>
     <link rel="icon" type="image/png" href="images/rss.png">
+    <link rel="stylesheet" href="theme-palettes.css">
 
     <style>
+        :root, [data-theme="og"] {{
+            --bg: #1f1f28;
+            --surface: #2a2a37;
+            --surface-2: #16161d;
+            --border: #54546d;
+            --text: #dcd7ba;
+            --text-muted: #938aa9;
+            --accent: #7e9cd8;
+            --accent-2: #957fb8;
+            --success: #76946a;
+            --warning: #c8c093;
+            --danger: #e46876;
+        }}
+
         * {{
             margin: 0;
             padding: 0;
@@ -171,7 +186,7 @@ def generate_index_html(feeds, output_dir):
 
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1f1f28;
+            background: var(--bg);
             min-height: 100vh;
             padding: 20px;
         }}
@@ -179,7 +194,7 @@ def generate_index_html(feeds, output_dir):
         .container {{
             max-width: 1400px;
             margin: 0 auto;
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
@@ -189,18 +204,18 @@ def generate_index_html(feeds, output_dir):
             text-align: center;
             margin-bottom: 40px;
             padding-bottom: 30px;
-            border-bottom: 3px solid #7e9cd8;
+            border-bottom: 3px solid var(--accent);
         }}
 
         h1 {{
             font-size: 3em;
-            color: #dcd7ba;
+            color: var(--text);
             margin-bottom: 10px;
         }}
 
         .subtitle {{
             font-size: 1.2em;
-            color: #938aa9;
+            color: var(--text-muted);
             margin-bottom: 20px;
         }}
 
@@ -213,8 +228,8 @@ def generate_index_html(feeds, output_dir):
         }}
 
         .global-stat {{
-            background: linear-gradient(135deg, #7e9cd8 0%, #957fb8 100%);
-            color: #1f1f28;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: var(--bg);
             padding: 20px 30px;
             border-radius: 15px;
             font-weight: 600;
@@ -242,21 +257,21 @@ def generate_index_html(feeds, output_dir):
             max-width: 600px;
             padding: 15px 25px;
             font-size: 1.1em;
-            border: 2px solid #54546d;
-            background: #16161d;
-            color: #dcd7ba;
+            border: 2px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
             border-radius: 50px;
             outline: none;
             transition: all 0.3s;
         }}
 
         .search-input:focus {{
-            border-color: #7e9cd8;
+            border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(126, 156, 216, 0.2);
         }}
 
         .search-input::placeholder {{
-            color: #938aa9;
+            color: var(--text-muted);
         }}
 
         .feeds-grid {{
@@ -267,7 +282,7 @@ def generate_index_html(feeds, output_dir):
         }}
 
         .feed-card {{
-            background: #16161d;
+            background: var(--surface-2);
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
@@ -283,7 +298,7 @@ def generate_index_html(feeds, output_dir):
 
         .feed-title {{
             font-size: 1.5em;
-            color: #dcd7ba;
+            color: var(--text);
             margin-bottom: 15px;
             word-wrap: break-word;
         }}
@@ -298,7 +313,7 @@ def generate_index_html(feeds, output_dir):
         .stat-item {{
             text-align: center;
             padding: 10px;
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 8px;
         }}
 
@@ -311,27 +326,27 @@ def generate_index_html(feeds, output_dir):
         .stat-number {{
             font-size: 1.3em;
             font-weight: bold;
-            color: #7e9cd8;
+            color: var(--accent);
             display: block;
         }}
 
         .stat-label {{
             font-size: 0.8em;
-            color: #938aa9;
+            color: var(--text-muted);
             display: block;
             margin-top: 2px;
         }}
 
         .feed-date {{
             font-size: 0.9em;
-            color: #938aa9;
+            color: var(--text-muted);
             margin-bottom: 15px;
         }}
 
         .feed-link {{
             display: inline-block;
-            background: linear-gradient(135deg, #7e9cd8 0%, #957fb8 100%);
-            color: #1f1f28;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: var(--bg);
             padding: 12px 30px;
             border-radius: 25px;
             text-decoration: none;
@@ -349,7 +364,7 @@ def generate_index_html(feeds, output_dir):
         .no-results {{
             text-align: center;
             padding: 60px 20px;
-            color: #938aa9;
+            color: var(--text-muted);
             font-size: 1.2em;
         }}
 
@@ -360,8 +375,8 @@ def generate_index_html(feeds, output_dir):
 
         .tools-link a {{
             display: inline-block;
-            background: #54546d;
-            color: #dcd7ba;
+            background: var(--border);
+            color: var(--text);
             padding: 15px 30px;
             border-radius: 12px;
             text-decoration: none;
@@ -378,17 +393,81 @@ def generate_index_html(feeds, output_dir):
             text-align: center;
             margin-top: 50px;
             padding-top: 30px;
-            border-top: 2px solid #54546d;
-            color: #938aa9;
+            border-top: 2px solid var(--border);
+            color: var(--text-muted);
         }}
 
         footer a {{
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
         }}
 
         footer a:hover {{
             text-decoration: underline;
+        }}
+
+        @keyframes spin {{
+            from {{ transform: rotate(0deg); }}
+            to {{ transform: rotate(360deg); }}
+        }}
+
+        /* Botón de actualización flotante */
+        #update-btn {{
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: var(--bg);
+            border: none;
+            padding: 14px 22px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(126, 156, 216, 0.5);
+            transition: all 0.3s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+
+        #update-btn:hover:not(:disabled) {{
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(126, 156, 216, 0.7);
+        }}
+
+        #update-btn:disabled {{
+            opacity: 0.6;
+            cursor: not-allowed;
+        }}
+
+        #update-toast {{
+            position: fixed;
+            bottom: 90px;
+            right: 30px;
+            background: var(--surface);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+            max-width: 280px;
+            border-left: 4px solid var(--accent);
+            z-index: 1001;
+        }}
+
+        #update-toast.show {{
+            opacity: 1;
+            transform: translateY(0);
+        }}
+
+        #update-toast.error {{
+            border-left-color: var(--danger);
         }}
 
         @media (max-width: 768px) {{
@@ -468,7 +547,82 @@ def generate_index_html(feeds, output_dir):
         </footer>
     </div>
 
+    <button id="update-btn" onclick="triggerUpdate()">
+        <span id="update-icon">&#x21bb;</span>
+        <span id="update-label">Actualizar</span>
+    </button>
+    <div id="update-toast"></div>
+
     <script>
+        function showToast(msg, isError) {{
+            const t = document.getElementById('update-toast');
+            t.textContent = msg;
+            t.className = 'show' + (isError ? ' error' : '');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.className = '', 4000);
+        }}
+
+        function setUpdating(active) {{
+            const btn = document.getElementById('update-btn');
+            const icon = document.getElementById('update-icon');
+            const label = document.getElementById('update-label');
+            btn.disabled = active;
+            if (active) {{
+                icon.style.animation = 'spin 1s linear infinite';
+                label.textContent = 'Actualizando...';
+            }} else {{
+                icon.style.animation = '';
+                label.textContent = 'Actualizar';
+            }}
+        }}
+
+        function pollStatus() {{
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(s => {{
+                    if (s.running) {{
+                        setUpdating(true);
+                        setTimeout(pollStatus, 2000);
+                    }} else {{
+                        setUpdating(false);
+                        if (s.last_error) {{
+                            showToast('Error: ' + s.last_error, true);
+                        }} else if (s.last_update) {{
+                            showToast('Actualizado correctamente. Recarga la pagina.');
+                            setTimeout(() => location.reload(), 2500);
+                        }}
+                    }}
+                }})
+                .catch(() => setTimeout(pollStatus, 3000));
+        }}
+
+        function triggerUpdate() {{
+            setUpdating(true);
+            showToast('Iniciando actualizacion...');
+            fetch('/api/update', {{ method: 'POST' }})
+                .then(r => {{
+                    if (r.status === 409) {{
+                        showToast('Ya hay una actualizacion en curso.');
+                        pollStatus();
+                    }} else if (r.ok) {{
+                        pollStatus();
+                    }} else {{
+                        showToast('Error al iniciar la actualizacion.', true);
+                        setUpdating(false);
+                    }}
+                }})
+                .catch(() => {{
+                    showToast('No se pudo conectar con el servidor.', true);
+                    setUpdating(false);
+                }});
+        }}
+
+        // Comprobar si hay actualizacion en curso al cargar
+        fetch('/api/status')
+            .then(r => r.json())
+            .then(s => {{ if (s.running) {{ setUpdating(true); pollStatus(); }} }})
+            .catch(() => {{}});
+
         function filterFeeds() {{
             const searchTerm = document.getElementById('search').value.toLowerCase();
             const feedCards = document.querySelectorAll('.feed-card');
@@ -492,6 +646,7 @@ def generate_index_html(feeds, output_dir):
             }}
         }}
     </script>
+    <script src="theme-picker.js"></script>
 </body>
 </html>
 """

@@ -617,7 +617,22 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{escape(feed_name)} - Embeds</title>
+    <link rel="stylesheet" href="theme-palettes.css">
     <style>
+        :root, [data-theme="og"] {{
+            --bg: #1f1f28;
+            --surface: #2a2a37;
+            --surface-2: #16161d;
+            --border: #54546d;
+            --text: #dcd7ba;
+            --text-muted: #938aa9;
+            --accent: #7e9cd8;
+            --accent-2: #957fb8;
+            --success: #76946a;
+            --warning: #c8c093;
+            --danger: #e46876;
+        }}
+
         * {{
             margin: 0;
             padding: 0;
@@ -626,7 +641,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
 
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1f1f28;
+            background: var(--bg);
             min-height: 100vh;
             padding: 20px;
         }}
@@ -642,14 +657,14 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }}
 
         h1 {{
-            color: #dcd7ba;
+            color: var(--text);
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }}
 
         .stats {{
-            color: #c8c093;
+            color: var(--warning);
             font-size: 1.1em;
         }}
 
@@ -667,7 +682,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }}
 
         .embed-item {{
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
@@ -681,7 +696,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
 
         .embed-item.listened {{
             opacity: 0.4;
-            background: #1a1a22;
+            background: var(--surface-2);
         }}
 
         .embed-item.listened:hover {{
@@ -700,26 +715,26 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
 
         .embed-info h3 {{
             font-size: 1.1em;
-            color: #dcd7ba;
+            color: var(--text);
             margin-bottom: 10px;
             line-height: 1.4;
         }}
 
         .embed-info .meta {{
             font-size: 0.9em;
-            color: #938aa9;
+            color: var(--text-muted);
             margin-bottom: 8px;
         }}
 
         .embed-info a {{
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
             font-size: 0.9em;
         }}
 
         .embed-info a:hover {{
             text-decoration: underline;
-            color: #957fb8;
+            color: var(--accent-2);
         }}
 
         .embed-container {{
@@ -736,8 +751,8 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         .listen-btn {{
             margin-top: 15px;
             padding: 10px 20px;
-            background: #7e9cd8;
-            color: #1f1f28;
+            background: var(--accent);
+            color: var(--bg);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -748,13 +763,13 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }}
 
         .listen-btn:hover {{
-            background: #957fb8;
+            background: var(--accent-2);
             transform: translateY(-2px);
         }}
 
         .listen-btn.listened {{
-            background: #54546d;
-            color: #938aa9;
+            background: var(--border);
+            color: var(--text-muted);
         }}
 
         .listen-btn.listened:hover {{
@@ -772,8 +787,8 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
 
         .page-btn {{
             padding: 10px 20px;
-            background: #54546d;
-            color: #dcd7ba;
+            background: var(--border);
+            color: var(--text);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -786,30 +801,30 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }}
 
         .page-btn:disabled {{
-            background: #2a2a37;
-            color: #54546d;
+            background: var(--surface);
+            color: var(--border);
             cursor: not-allowed;
         }}
 
         .page-btn.active {{
-            background: #7e9cd8;
-            color: #1f1f28;
+            background: var(--accent);
+            color: var(--bg);
             font-weight: bold;
         }}
 
         .page-info {{
             padding: 10px 20px;
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 8px;
             font-weight: 600;
-            color: #c8c093;
+            color: var(--warning);
         }}
 
         .loading {{
             text-align: center;
             padding: 40px;
             font-size: 1.2em;
-            color: #938aa9;
+            color: var(--text-muted);
         }}
 
         .loading::after {{
@@ -827,12 +842,12 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             text-align: center;
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 2px solid #2a2a37;
-            color: #938aa9;
+            border-top: 2px solid var(--surface);
+            color: var(--text-muted);
         }}
 
         footer a {{
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
         }}
 
@@ -1072,6 +1087,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             }}
         }});
     </script>
+    <script src="theme-picker.js"></script>
 </body>
 </html>
 """
