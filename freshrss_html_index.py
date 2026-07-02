@@ -164,7 +164,7 @@ def generate_index_html(feeds, output_dir):
     <link rel="stylesheet" href="theme-palettes.css">
 
     <style>
-        :root, [data-theme="og"] {{
+        [data-theme="og"], :root:not([data-theme]) {{
             --bg: #1f1f28;
             --surface: #2a2a37;
             --surface-2: #16161d;

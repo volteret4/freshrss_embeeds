@@ -619,7 +619,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
     <title>{escape(feed_name)} - Embeds</title>
     <link rel="stylesheet" href="theme-palettes.css">
     <style>
-        :root, [data-theme="og"] {{
+        [data-theme="og"], :root:not([data-theme]) {{
             --bg: #1f1f28;
             --surface: #2a2a37;
             --surface-2: #16161d;
