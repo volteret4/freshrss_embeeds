@@ -1,0 +1,17 @@
+[Unit]
+Description=FreshRSS Embeds Web Server
+After=network.target
+
+[Service]
+Type=simple
+User=huan
+WorkingDirectory=/home/huan/gits/freshrss_embeeds
+EnvironmentFile=/home/huan/gits/freshrss_embeeds/.env
+ExecStart=/home/huan/Scripts/python_venv/bin/python serve.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
