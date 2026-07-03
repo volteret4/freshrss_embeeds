@@ -647,6 +647,7 @@ def generate_index_html(feeds, output_dir):
         }}
     </script>
     <script src="theme-picker.js"></script>
+    <script src="settings-panel.js"></script>
 </body>
 </html>
 """

@@ -21,6 +21,8 @@ import urllib.request
 import urllib.error
 import time
 from pathlib import Path
+
+import freshrss_db
 from html import escape
 from collections import defaultdict
 from urllib.parse import urlparse, parse_qs
@@ -587,6 +589,12 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             'id': sc.get('id', sc['url'])
         })
 
+    # Descarta los ya marcados como "escuchado/visto" en el servidor (SQLite,
+    # vía /api/listened) — solo local, no toca el estado de leído en FreshRSS,
+    # así que sin este filtro reaparecerían en cada regeneración.
+    already_listened = freshrss_db.listened_ids()
+    all_embeds = [e for e in all_embeds if e['id'] not in already_listened]
+
     # Ordenar por fecha (más recientes primero)
     all_embeds.sort(key=lambda x: x['date'], reverse=True)
 
@@ -908,12 +916,20 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             }}
         }}
 
-        // Marcar/desmarcar item como escuchado
+        // Marcar/desmarcar item como escuchado. Solo "marcar" se persiste en
+        // el servidor (SQLite, vía /api/listened) — el servidor no soporta
+        // desmarcar, así que "desmarcar" aquí es solo visual/local hasta la
+        // próxima regeneración.
         function toggleListened(itemId) {{
             if (listenedItems.has(itemId)) {{
                 listenedItems.delete(itemId);
             }} else {{
                 listenedItems.add(itemId);
+                fetch('/api/listened', {{
+                    method: 'POST',
+                    headers: {{'Content-Type': 'application/json'}},
+                    body: JSON.stringify({{id: itemId}}),
+                }}).catch(err => console.error('No se pudo guardar en el servidor:', err));
             }}
             saveListenedItems();
             loadPage(currentPage);
@@ -1088,6 +1104,7 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }});
     </script>
     <script src="theme-picker.js"></script>
+    <script src="settings-panel.js"></script>
 </body>
 </html>
 """
