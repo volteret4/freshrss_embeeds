@@ -684,8 +684,77 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
         }}
 
         @media (max-width: 768px) {{
+            body {{
+                padding: 12px;
+            }}
+
             .embeds-grid {{
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }}
+
+            header {{
+                margin-bottom: 24px;
+            }}
+
+            h1 {{
+                font-size: 1.8em;
+                overflow-wrap: break-word;
+            }}
+
+            .embed-item {{
+                padding: 16px;
+            }}
+
+            .pagination {{
+                gap: 8px;
+                margin: 24px 0;
+            }}
+
+            .page-btn,
+            .listen-btn {{
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }}
+
+            .page-info {{
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }}
+        }}
+
+        @media (max-width: 480px) {{
+            body {{
+                padding: 8px;
+            }}
+
+            h1 {{
+                font-size: 1.4em;
+            }}
+
+            .stats {{
+                font-size: 1em;
+            }}
+
+            .embed-item {{
+                padding: 12px;
+                border-radius: 8px;
+            }}
+
+            .embed-info h3 {{
+                font-size: 1em;
+            }}
+
+            .page-btn {{
+                padding: 10px 14px;
+                font-size: 0.95em;
+            }}
+
+            .pagination {{
+                gap: 6px;
             }}
         }}
 
@@ -695,6 +764,10 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+            /* Sin esto, un grid item no encoge por debajo del ancho de su
+               contenido (min-width: auto por defecto) y un título largo sin
+               espacios fuerza scroll horizontal en pantallas estrechas. */
+            min-width: 0;
         }}
 
         .embed-item:hover {{
@@ -726,6 +799,8 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             color: var(--text);
             margin-bottom: 10px;
             line-height: 1.4;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }}
 
         .embed-info .meta {{
@@ -754,6 +829,15 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
 
         .embed-container iframe {{
             max-width: 100%;
+        }}
+
+        /* Los embeds de YouTube traen width/height fijos (560x315) en el
+           <iframe>; forzamos proporción 16:9 fluida para que no queden
+           recortados ni deformados al encogerse en pantallas estrechas. */
+        .embed-container iframe[src*="youtube"] {{
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
         }}
 
         .listen-btn {{

@@ -289,6 +289,10 @@ def generate_index_html(feeds, output_dir):
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
+            /* Sin esto, un grid item no encoge por debajo del ancho de su
+               contenido (min-width: auto por defecto) y una palabra larga
+               en el título fuerza scroll horizontal en pantallas estrechas. */
+            min-width: 0;
         }}
 
         .feed-card:hover {{
@@ -471,8 +475,13 @@ def generate_index_html(feeds, output_dir):
         }}
 
         @media (max-width: 768px) {{
+            body {{
+                padding: 12px;
+            }}
+
             .feeds-grid {{
                 grid-template-columns: 1fr;
+                gap: 16px;
             }}
 
             h1 {{
@@ -483,8 +492,73 @@ def generate_index_html(feeds, output_dir):
                 padding: 20px;
             }}
 
+            .global-stats {{
+                gap: 15px;
+            }}
+
+            .global-stat {{
+                padding: 14px 20px;
+            }}
+
             .feed-stats {{
                 grid-template-columns: repeat(3, 1fr);
+            }}
+
+            .feed-link,
+            .tools-link a,
+            #update-btn {{
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }}
+        }}
+
+        @media (max-width: 480px) {{
+            body {{
+                padding: 8px;
+            }}
+
+            .container {{
+                padding: 14px;
+                border-radius: 12px;
+            }}
+
+            h1 {{
+                font-size: 1.5em;
+            }}
+
+            .subtitle {{
+                font-size: 1em;
+            }}
+
+            .global-stat {{
+                padding: 10px 16px;
+            }}
+
+            .global-stat-number {{
+                font-size: 1.5em;
+            }}
+
+            .feed-stats {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
+
+            .feed-card {{
+                padding: 16px;
+            }}
+
+            #update-btn {{
+                bottom: 16px;
+                right: 16px;
+                padding: 12px 18px;
+            }}
+
+            #update-toast {{
+                bottom: 76px;
+                right: 16px;
+                left: 16px;
+                max-width: none;
             }}
         }}
     </style>
