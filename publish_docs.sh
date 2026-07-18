@@ -9,6 +9,15 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# En Docker, .git es un puntero de submodule ("gitdir: ../../.git/modules/...")
+# que resuelve a una ruta del HOST inaccesible dentro del contenedor. Si el
+# compose monta el gitdir real en /gitdir, usarlo explícito evita depender de
+# esa resolución relativa rota.
+if [ -d /gitdir ]; then
+    export GIT_DIR=/gitdir
+    export GIT_WORK_TREE="$(pwd)"
+fi
+
 if [ -f .env ]; then
     set -a
     source .env
