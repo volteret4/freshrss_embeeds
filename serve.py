@@ -63,6 +63,16 @@ def _read_env_file(path):
     return values
 
 
+def _shell_quote_env_value(v):
+    # publish_docs.sh hace "source .env"; sin comillas, un valor con "$algo"
+    # (p.ej. una contraseña con ese substring literal) se intenta expandir
+    # como variable y revienta el propio "source" con "set -u" activo.
+    # Comillas simples evitan además cualquier otra expansión al hacer source.
+    if v == "":
+        return "''"
+    return "'" + v.replace("'", "'\\''") + "'"
+
+
 def _write_env_file(path, updates):
     lines = []
     if os.path.exists(path):
@@ -75,7 +85,7 @@ def _write_env_file(path, updates):
         if s and not s.startswith("#") and "=" in s:
             k = s.split("=", 1)[0].strip()
             if k in updates:
-                out.append(f"{k}={updates[k]}\n")
+                out.append(f"{k}={_shell_quote_env_value(updates[k])}\n")
                 seen.add(k)
                 continue
         out.append(line)
@@ -83,7 +93,7 @@ def _write_env_file(path, updates):
         if k not in seen:
             if out and not out[-1].endswith("\n"):
                 out[-1] += "\n"
-            out.append(f"{k}={v}\n")
+            out.append(f"{k}={_shell_quote_env_value(v)}\n")
     with open(path, "w", encoding="utf-8") as f:
         f.writelines(out)
 
