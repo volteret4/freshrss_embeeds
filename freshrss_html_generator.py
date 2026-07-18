@@ -544,6 +544,40 @@ def sanitize_feed_name(feed_name):
     return safe_name
 
 
+def _load_existing_embeds(filepath):
+    """
+    Recupera los embeds ya publicados en un HTML generado por esta misma
+    función, leyendo el "const allPagesData = {...}" que ella misma incrusta.
+    Necesario porque cada corrida solo trae los artículos NUEVOS no leídos
+    (--unread-only) — sin esto, regenerar un feed con solo lo de hoy borra
+    el histórico acumulado de ejecuciones anteriores.
+    """
+    if not os.path.exists(filepath):
+        return {}
+    try:
+        html_text = Path(filepath).read_text(encoding="utf-8")
+    except OSError:
+        return {}
+
+    marker = "const allPagesData = "
+    idx = html_text.find(marker)
+    if idx == -1:
+        return {}
+    start = idx + len(marker)
+    try:
+        pages_data, _ = json.JSONDecoder().raw_decode(html_text, start)
+    except (json.JSONDecodeError, ValueError):
+        return {}
+
+    recovered = {}
+    for embeds in pages_data.values():
+        for e in embeds:
+            key = e.get("id") or e.get("url")
+            if key:
+                recovered[key] = e
+    return recovered
+
+
 def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_pages_buttons=15):
     """
     Genera un archivo HTML con paginación para un feed específico.
@@ -589,6 +623,20 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
             'id': sc.get('id', sc['url'])
         })
 
+    # CORREGIDO: Generar nombre de archivo único para cada feed
+    safe_name = sanitize_feed_name(feed_name)
+    main_filename = f"{safe_name}.html"
+
+    # Fusiona con lo ya publicado en el archivo existente (ver
+    # _load_existing_embeds): cada corrida solo trae los artículos NUEVOS no
+    # leídos, así que sin esto se perdería el histórico acumulado.
+    merged_by_id = _load_existing_embeds(os.path.join(output_dir, main_filename))
+    for e in all_embeds:
+        key = e.get('id') or e.get('url')
+        if key:
+            merged_by_id[key] = e
+    all_embeds = list(merged_by_id.values())
+
     # Descarta los ya marcados como "escuchado/visto" en el servidor (SQLite,
     # vía /api/listened) — solo local, no toca el estado de leído en FreshRSS,
     # así que sin este filtro reaparecerían en cada regeneración.
@@ -610,10 +658,6 @@ def generate_feed_html(feed_name, embeds, output_dir, items_per_page=8, max_page
 
     # Convertir a JSON para incrustar
     pages_data_json = json.dumps(pages_data, ensure_ascii=False, indent=2)
-
-    # CORREGIDO: Generar nombre de archivo único para cada feed
-    safe_name = sanitize_feed_name(feed_name)
-    main_filename = f"{safe_name}.html"
 
     # Nombre sanitizado para localStorage
     storage_key = safe_name
