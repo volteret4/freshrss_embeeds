@@ -136,11 +136,17 @@ class FreshRSSClient:
 
         params = {'output': 'json'}
 
-        # CORREGIDO: Para unread_only, usar más artículos para tener suficientes
+        # count=0 significa "sin límite" (así lo llama serve.py en la
+        # actualización diaria: --max-articles 0). Sin este caso especial,
+        # count*10 y el slice [:count] de más abajo se quedan en 0 y la API
+        # nunca devuelve nada -- por eso la web dejó de traer artículos
+        # nuevos pese a que el cron corría bien todos los días.
+        unlimited = count <= 0
+        request_n = 1000 if unlimited else count
         if unread_only:
-            params['n'] = count * 10  # Multiplicar por 10 para asegurar suficientes no leídos
+            params['n'] = request_n * 10  # Multiplicar por 10 para asegurar suficientes no leídos
         else:
-            params['n'] = count
+            params['n'] = request_n
 
         if feed_id:
             params['s'] = feed_id
@@ -173,7 +179,9 @@ class FreshRSSClient:
                 articles.append(article)
 
             # CORREGIDO: Limitar después de filtrar
-            return articles[:count] if articles else []
+            if not articles:
+                return []
+            return articles if unlimited else articles[:count]
 
         except requests.exceptions.RequestException as e:
             print(f"❌ Error obteniendo artículos: {e}")
@@ -1307,7 +1315,7 @@ def main():
     parser.add_argument('--unread-only', action='store_true',
                        help='Solo procesar artículos no leídos')
     parser.add_argument('--max-articles', type=int, default=100,
-                       help='Número máximo de artículos a obtener por feed (default: 100)')
+                       help='Número máximo de artículos a obtener por feed (default: 100; 0 = sin límite)')
 
     # Opciones de salida
     parser.add_argument('--output-dir', default='docs',
