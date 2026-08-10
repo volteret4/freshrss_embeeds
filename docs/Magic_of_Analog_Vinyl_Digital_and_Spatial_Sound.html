@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic of Analog， Vinyl， Digital and Spatial Sound - Embeds</title>
+    <link rel="stylesheet" href="theme-palettes.css">
+    <style>
+        [data-theme="og"], :root:not([data-theme]) {
+            --bg: #1f1f28;
+            --surface: #2a2a37;
+            --surface-2: #16161d;
+            --border: #54546d;
+            --text: #dcd7ba;
+            --text-muted: #938aa9;
+            --accent: #7e9cd8;
+            --accent-2: #957fb8;
+            --success: #76946a;
+            --warning: #c8c093;
+            --danger: #e46876;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--text);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .stats {
+            color: var(--warning);
+            font-size: 1.1em;
+        }
+
+        .embeds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .embeds-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            header {
+                margin-bottom: 24px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                overflow-wrap: break-word;
+            }
+
+            .embed-item {
+                padding: 16px;
+            }
+
+            .pagination {
+                gap: 8px;
+                margin: 24px 0;
+            }
+
+            .page-btn,
+            .listen-btn {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-info {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .stats {
+                font-size: 1em;
+            }
+
+            .embed-item {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .embed-info h3 {
+                font-size: 1em;
+            }
+
+            .page-btn {
+                padding: 10px 14px;
+                font-size: 0.95em;
+            }
+
+            .pagination {
+                gap: 6px;
+            }
+        }
+
+        .embed-item {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+            /* Sin esto, un grid item no encoge por debajo del ancho de su
+               contenido (min-width: auto por defecto) y un título largo sin
+               espacios fuerza scroll horizontal en pantallas estrechas. */
+            min-width: 0;
+        }
+
+        .embed-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+        }
+
+        .embed-item.listened {
+            opacity: 0.4;
+            background: var(--surface-2);
+        }
+
+        .embed-item.listened:hover {
+            opacity: 0.6;
+        }
+
+        .embed-info {
+            margin-bottom: 15px;
+        }
+
+        .embed-type {
+            display: inline-block;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .embed-info h3 {
+            font-size: 1.1em;
+            color: var(--text);
+            margin-bottom: 10px;
+            line-height: 1.4;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .embed-info .meta {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .embed-info a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .embed-info a:hover {
+            text-decoration: underline;
+            color: var(--accent-2);
+        }
+
+        .embed-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .embed-container iframe {
+            max-width: 100%;
+        }
+
+        /* Los embeds de YouTube traen width/height fijos (560x315) en el
+           <iframe>; forzamos proporción 16:9 fluida para que no queden
+           recortados ni deformados al encogerse en pantallas estrechas. */
+        .embed-container iframe[src*="youtube"] {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
+        .listen-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            width: 100%;
+        }
+
+        .listen-btn:hover {
+            background: var(--accent-2);
+            transform: translateY(-2px);
+        }
+
+        .listen-btn.listened {
+            background: var(--border);
+            color: var(--text-muted);
+        }
+
+        .listen-btn.listened:hover {
+            background: #625e7f;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            background: var(--border);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #625e7f;
+        }
+
+        .page-btn:disabled {
+            background: var(--surface);
+            color: var(--border);
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+            font-weight: bold;
+        }
+
+        .page-info {
+            padding: 10px 20px;
+            background: var(--surface);
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--warning);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--surface);
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Magic of Analog， Vinyl， Digital and Spatial Sound</h1>
+            <div class="stats">
+                Total: 26 embeds únicos | Páginas: 4
+            </div>
+        </header>
+
+        <div id="pagination-top" class="pagination"></div>
+        <div id="content"></div>
+        <div id="pagination-bottom" class="pagination"></div>
+
+        <footer>
+            <p>Generado desde FreshRSS (versión corregida)</p>
+        </footer>
+    </div>
+
+    <script>
+        // Datos incrustados directamente en el HTML
+        const allPagesData = {
+  "1": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/hkGgLKtZM7c",
+      "title": "Franck Martin- Thanks For The Invite – An immersive electronic music composition – Reviewed (Streaming, MKV, Stereo to Dolby Atmos and Master ADM)",
+      "article_link": "https://magicvinyldigital.net/2026/07/26/franck-martin-thanks-for-the-invite-an-immersive-electronic-music-composition-reviewed-streaming-mkv-stereo-to-dolby-atmos-and-master-adm/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-07-26 14:00",
+      "id": "https://www.youtube.com/embed/hkGgLKtZM7c"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/3pY995qGeq8",
+      "title": "Ludwig Göransson – The Odyssey reviewed: Stereo vs Dolby Atmos – Which Version Delivers the True Cinematic IMAX Experience ? Updated with Gold Marbred Vinyl",
+      "article_link": "https://magicvinyldigital.net/2026/07/23/ludwig-goransson-the-odyssey-reviewed-stereo-vs-dolby-atmos-which-version-delivers-the-true-cinematic-imax-experience/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-07-23 11:06",
+      "id": "https://www.youtube.com/embed/3pY995qGeq8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/97pQVd2C3BQ",
+      "title": "Tori Amos – In Times of Dragons – Is the Blu-ray Audio Edition the Definitive Version? Review – Blu-ray vs Streaming vs Vinyl, Stereo vs Dolby Atmos",
+      "article_link": "https://magicvinyldigital.net/2026/07/19/tori-amos-in-times-of-dragons-is-the-blu-ray-audio-edition-the-definitive-version-review-blu-ray-vs-streaming-vs-vinyl-stereo-vs-dolby-atmos/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-07-19 14:46",
+      "id": "https://www.youtube.com/embed/97pQVd2C3BQ"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/vZU1ukK4mc8",
+      "title": "Michael Jackson – Invincible – Available in Dolby Atmos, a new reference Atmos mix? – Reviewed",
+      "article_link": "https://magicvinyldigital.net/2026/07/18/michael-jackson-invincible-available-in-dolby-atmos-a-new-reference-atmos-mix-reviewed/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-07-18 17:10",
+      "id": "https://www.youtube.com/embed/vZU1ukK4mc8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/hjLp-Y-MpAs",
+      "title": "The Rolling Stones – Foreign Tongues Reviewed: Are the Vinyl and Blu-ray the Definitive Editions?",
+      "article_link": "https://magicvinyldigital.net/2026/07/12/the-rolling-stones-foreign-tongues-reviewed-are-the-vinyl-and-blu-ray-the-definitive-editions/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-07-12 15:33",
+      "id": "https://www.youtube.com/embed/hjLp-Y-MpAs"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/NSWPqurQw10",
+      "title": "Michael Jackson – History Continues – Available in Dolby Atmos – Reviewed",
+      "article_link": "https://magicvinyldigital.net/2026/07/09/michael-jackson-history-continues-available-in-dolby-atmos-reviewed/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-07-09 17:01",
+      "id": "https://www.youtube.com/embed/NSWPqurQw10"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/PbyaJlf0JVM",
+      "title": "Muse – The Wow! Signal – Reviewed – Digital vs Vinyl record vs Dolby Atmos, which is the best edition?",
+      "article_link": "https://magicvinyldigital.net/2026/06/28/muse-the-wow-signal-reviewed-digital-vs-vinyl-record-vs-dolby-atmos-which-is-the-best-edition/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-28 08:24",
+      "id": "https://www.youtube.com/embed/PbyaJlf0JVM"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/t9UsFbCuM7I",
+      "title": "Sting – The Night Watch (Live at the Rijksmuseum) – Music in the atmosphere of a museum – Reviewed (stereo vs Dolby Atmos), with immersive 3D visualization video",
+      "article_link": "https://magicvinyldigital.net/2026/06/27/sting-the-night-watch-live-at-the-rijksmuseum-music-in-the-atmosphere-of-a-museum-reviewed-stereo-vs-dolby-atmos-with-immersive-3d-visualization-video/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-27 15:58",
+      "id": "https://www.youtube.com/embed/t9UsFbCuM7I"
+    }
+  ],
+  "2": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/biMUiFgC9Qc",
+      "title": "Sting – The Night Watch (Live at the Rijksmuseum) – Music in the atmosphere of a museum – Reviewed (stereo vs Dolby Atmos), with immersive 3D visualization video",
+      "article_link": "https://magicvinyldigital.net/2026/06/27/sting-the-night-watch-live-at-the-rijksmuseum-music-in-the-atmosphere-of-a-museum-reviewed-stereo-vs-dolby-atmos-with-immersive-3d-visualization-video/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-27 15:58",
+      "id": "https://www.youtube.com/embed/biMUiFgC9Qc"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/-ghkHUTbpoI",
+      "title": "Randy Newman and Taylor Swift – Toy Story 5 (Original Motion Picture Soundtrack) – Reviewed (stereo vs Dolby Atmos)",
+      "article_link": "https://magicvinyldigital.net/2026/06/20/randy-newman-and-taylor-swift-toy-story-5-original-motion-picture-soundtrack-reviewed-stereo-vs-dolby-atmos/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-20 16:03",
+      "id": "https://www.youtube.com/embed/-ghkHUTbpoI"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/YGd6wT4V_9Q",
+      "title": "HIGH END Vienna 2026: Exceptional Systems and the Best Sound of the Show",
+      "article_link": "https://magicvinyldigital.net/2026/06/09/high-end-vienna-2026-exceptional-systems-and-the-best-sound-of-the-show/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-09 16:31",
+      "id": "https://www.youtube.com/embed/YGd6wT4V_9Q"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/1eo6UaN9FCU",
+      "title": "Vienna High-end 2026, vidéo part 2: Acapella, Revival Audio, MAAT GOTO with great live…",
+      "article_link": "https://magicvinyldigital.net/2026/06/06/vienna-high-end-2026-video-part-2-acapella-revival-audio-maat-goto-with-great-live/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-05 22:28",
+      "id": "https://www.youtube.com/embed/1eo6UaN9FCU"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/4XtaM_7O7GM",
+      "title": "Vienna High-end 2026, vidéo part 2: Acapella, Revival Audio, MAAT GOTO with great live…",
+      "article_link": "https://magicvinyldigital.net/2026/06/06/vienna-high-end-2026-video-part-2-acapella-revival-audio-maat-goto-with-great-live/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-05 22:28",
+      "id": "https://www.youtube.com/embed/4XtaM_7O7GM"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/FRuafGrDQCk",
+      "title": "Vienna High-end 2026, vidéo part 2: Acapella, Revival Audio, MAAT GOTO with great live…",
+      "article_link": "https://magicvinyldigital.net/2026/06/06/vienna-high-end-2026-video-part-2-acapella-revival-audio-maat-goto-with-great-live/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-05 22:28",
+      "id": "https://www.youtube.com/embed/FRuafGrDQCk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/29BmkwqWmWg",
+      "title": "Vienna High-end 2026, vidéo part 2: Acapella, Revival Audio, MAAT GOTO with great live…",
+      "article_link": "https://magicvinyldigital.net/2026/06/06/vienna-high-end-2026-video-part-2-acapella-revival-audio-maat-goto-with-great-live/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-05 22:28",
+      "id": "https://www.youtube.com/embed/29BmkwqWmWg"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Nth9B-G1nTo",
+      "title": "Vienna High-end 2026, vidéo part 1: Cessaro, one millions dollars system, JBL…",
+      "article_link": "https://magicvinyldigital.net/2026/06/04/vienna-high-end-2026-video-part-1-cessaro-one-millions-dollars-system-jbl/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-04 20:01",
+      "id": "https://www.youtube.com/embed/Nth9B-G1nTo"
+    }
+  ],
+  "3": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/8Mv8axgcqFQ",
+      "title": "Vienna High-end 2026, vidéo part 1: Cessaro, one millions dollars system, JBL…",
+      "article_link": "https://magicvinyldigital.net/2026/06/04/vienna-high-end-2026-video-part-1-cessaro-one-millions-dollars-system-jbl/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-04 20:01",
+      "id": "https://www.youtube.com/embed/8Mv8axgcqFQ"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/RK-iG7rXj_0",
+      "title": "Vienna High-end 2026, vidéo part 1: Cessaro, one millions dollars system, JBL…",
+      "article_link": "https://magicvinyldigital.net/2026/06/04/vienna-high-end-2026-video-part-1-cessaro-one-millions-dollars-system-jbl/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-04 20:01",
+      "id": "https://www.youtube.com/embed/RK-iG7rXj_0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/TbcgKtq-KQ8",
+      "title": "Vienna High-end 2026, vidéo part 1: Cessaro, one millions dollars system, JBL…",
+      "article_link": "https://magicvinyldigital.net/2026/06/04/vienna-high-end-2026-video-part-1-cessaro-one-millions-dollars-system-jbl/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-04 20:01",
+      "id": "https://www.youtube.com/embed/TbcgKtq-KQ8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/yp6T1yaeW0o",
+      "title": "Paul McCartney – The Boys of Dungeon Lane – Reviewed (stereo vs Dolby Atmos), Included a new 3d immersive video rendering",
+      "article_link": "https://magicvinyldigital.net/2026/06/03/paul-mccartney-the-boys-of-dungeon-lane-reviewed-stereo-vs-dolby-atmos/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-06-03 08:21",
+      "id": "https://www.youtube.com/embed/yp6T1yaeW0o"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/djXqamN628w",
+      "title": "Lucas Garcia, Muramoto ＆ Yu Nitahara – Nocturne – Reviewed (DXD 5.1.4, MKV Dolby Atmos TrueHD, DSD stereo and 5.1, PCM Highres) Included 3d immersive video rendering",
+      "article_link": "https://magicvinyldigital.net/2026/05/31/lucas-garcia-muramoto-yu-nitahara-nocturne-reviewed-dxd-5-1-4-mkv-dolby-atmos-truehd-dsd-stereo-and-5-1-pcm-highres-included-3d-immersive-video-rendering/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-05-31 15:11",
+      "id": "https://www.youtube.com/embed/djXqamN628w"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/b0sb7ZNyFMA",
+      "title": "Lucas Garcia, Muramoto ＆ Yu Nitahara – Nocturne – Reviewed (DXD 5.1.4, MKV Dolby Atmos TrueHD, DSD stereo and 5.1, PCM Highres) Included 3d immersive video rendering",
+      "article_link": "https://magicvinyldigital.net/2026/05/31/lucas-garcia-muramoto-yu-nitahara-nocturne-reviewed-dxd-5-1-4-mkv-dolby-atmos-truehd-dsd-stereo-and-5-1-pcm-highres-included-3d-immersive-video-rendering/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-05-31 15:11",
+      "id": "https://www.youtube.com/embed/b0sb7ZNyFMA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/FF73t73DwZ0",
+      "title": "The secrets of a legendary turntable RESURRECTION revealed by its designer Pierre Riffaud.",
+      "article_link": "https://magicvinyldigital.net/2026/05/29/the-secrets-of-a-legendary-turntable-resurrection-revealed-by-its-designer-pierre-ruffaud/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-05-29 20:12",
+      "id": "https://www.youtube.com/embed/FF73t73DwZ0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/SqXu27P6lM0",
+      "title": "Dominique Fils-Aimé My World Is The Sun – Ambassador of the Vienna HIGH END 2026 – and the interview with sound engineer Jacques Roy – Review (High Res 24 96 vs Dolby Atmos vs pureaudiostreaming in 7.1.4 vs Vinyl record…)",
+      "article_link": "https://magicvinyldigital.net/2026/05/24/dominique-fils-aime-my-world-is-the-sun-ambassador-of-the-vienna-high-end-2026-and-the-interview-with-sound-engineer-jacques-roy-review-high-res-24-96-vs-dolby-atmos-vs-pureaudiostreaming-in-7/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-05-24 08:26",
+      "id": "https://www.youtube.com/embed/SqXu27P6lM0"
+    }
+  ],
+  "4": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/w43XbXp83sk",
+      "title": "Dominique Fils-Aimé My World Is The Sun – Ambassador of the Vienna HIGH END 2026 – and the interview with sound engineer Jacques Roy – Review (High Res 24 96 vs Dolby Atmos vs pureaudiostreaming in 7.1.4 vs Vinyl record…)",
+      "article_link": "https://magicvinyldigital.net/2026/05/24/dominique-fils-aime-my-world-is-the-sun-ambassador-of-the-vienna-high-end-2026-and-the-interview-with-sound-engineer-jacques-roy-review-high-res-24-96-vs-dolby-atmos-vs-pureaudiostreaming-in-7/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-05-24 08:26",
+      "id": "https://www.youtube.com/embed/w43XbXp83sk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/NFyjYSZ2fRE",
+      "title": "Ludwig Goransson – Star Wars The Mandalorian and Grogu (Original Motion Picture Soundtrack) – Reviewed (streaming stereo vs Dolby Atmos) Included 3d video rendering of immersive audio",
+      "article_link": "https://magicvinyldigital.net/2026/05/22/ludwig-goransson-star-wars-the-mandalorian-and-grogu-original-motion-picture-soundtrack-reviewed-streaming-stereo-vs-dolby-atmos-included-3d-video-rendering-of-immersive-audio/",
+      "author": "jeanfrancoisw",
+      "feed": "Magic of Analog， Vinyl， Digital and Spatial Sound",
+      "date": "2026-05-22 17:27",
+      "id": "https://www.youtube.com/embed/NFyjYSZ2fRE"
+    }
+  ]
+};
+        const totalPages = 4;
+        const maxPagesButtons = 15;
+        const feedName = 'Magic_of_Analog_Vinyl_Digital_and_Spatial_Sound';
+        const storageKey = `freshrss_listened_${feedName}`;
+
+        let currentPage = 1;
+        let listenedItems = new Set();
+
+        // Cargar items escuchados desde localStorage
+        function loadListenedItems() {
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) {
+                    listenedItems = new Set(JSON.parse(stored));
+                    console.log(`Loaded ${listenedItems.size} listened items for ${feedName}`);
+                }
+            } catch (error) {
+                console.error('Error loading listened items:', error);
+            }
+        }
+
+        // Guardar items escuchados en localStorage
+        function saveListenedItems() {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(Array.from(listenedItems)));
+                console.log(`Saved ${listenedItems.size} listened items for ${feedName}`);
+            } catch (error) {
+                console.error('Error saving listened items:', error);
+            }
+        }
+
+        // Marcar/desmarcar item como escuchado. Solo "marcar" se persiste en
+        // el servidor (SQLite, vía /api/listened) — el servidor no soporta
+        // desmarcar, así que "desmarcar" aquí es solo visual/local hasta la
+        // próxima regeneración.
+        function toggleListened(itemId) {
+            if (listenedItems.has(itemId)) {
+                listenedItems.delete(itemId);
+            } else {
+                listenedItems.add(itemId);
+                fetch('/api/listened', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: itemId}),
+                }).catch(err => console.error('No se pudo guardar en el servidor:', err));
+            }
+            saveListenedItems();
+            loadPage(currentPage);
+        }
+
+        function generateBandcampEmbed(item) {
+            if (item.embed_html) {
+                return item.embed_html;
+            }
+            return `<p>URL de Bandcamp: <a href="${item.url}" target="_blank">${item.url}</a></p>`;
+        }
+
+        function generateYoutubeEmbed(url) {
+            const embedUrl = url.includes('?') ? url : `${url}`;
+            return `<iframe width="560" height="315" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        }
+
+        function generateSoundcloudEmbed(url) {
+            const encodedUrl = encodeURIComponent(url);
+            const embedUrl = `https://w.soundcloud.com/player/?url=${encodedUrl}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
+            return `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="${embedUrl}"></iframe>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateEmbedHTML(item) {
+            const typeIcons = {
+                'bandcamp': '🎵',
+                'youtube': '📺',
+                'soundcloud': '🔊'
+            };
+
+            const typeNames = {
+                'bandcamp': 'Bandcamp',
+                'youtube': 'YouTube',
+                'soundcloud': 'SoundCloud'
+            };
+
+            let embedCode = '';
+            if (item.type === 'bandcamp') {
+                embedCode = generateBandcampEmbed(item);
+            } else if (item.type === 'youtube') {
+                embedCode = generateYoutubeEmbed(item.url);
+            } else if (item.type === 'soundcloud') {
+                embedCode = generateSoundcloudEmbed(item.url);
+            }
+
+            const isListened = listenedItems.has(item.id);
+            const listenedClass = isListened ? 'listened' : '';
+            const btnText = isListened ? '✓ Escuchado' : 'Marcar como escuchado';
+            const btnClass = isListened ? 'listened' : '';
+
+            return `
+                <div class="embed-item ${listenedClass}" data-id="${escapeHtml(item.id)}">
+                    <div class="embed-info">
+                        <div class="embed-type">${typeIcons[item.type]} ${typeNames[item.type]}</div>
+                        <h3>${escapeHtml(item.title)}</h3>
+                        <p class="meta">
+                            📅 ${item.date}
+                            ${item.author ? ` | 👤 ${escapeHtml(item.author)}` : ''}
+                            ${item.feed ? ` | 📡 ${escapeHtml(item.feed)}` : ''}
+                        </p>
+                        <p><a href="${escapeHtml(item.article_link)}" target="_blank">Ver artículo original →</a></p>
+                    </div>
+                    <div class="embed-container">
+                        ${embedCode}
+                    </div>
+                    <button class="listen-btn ${btnClass}" onclick="toggleListened('${escapeHtml(item.id)}')">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+        }
+
+        function loadPage(pageNum) {
+            if (pageNum < 1 || pageNum > totalPages) return;
+
+            const content = document.getElementById('content');
+            const pageData = allPagesData[String(pageNum)];
+
+            if (!pageData) {
+                content.innerHTML = '<div class="loading">Página no encontrada</div>';
+                return;
+            }
+
+            let html = '<div class="embeds-grid">';
+            for (const item of pageData) {
+                html += generateEmbedHTML(item);
+            }
+            html += '</div>';
+
+            content.innerHTML = html;
+            currentPage = pageNum;
+            renderPagination();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderPagination() {
+            const paginationHTML = createPaginationButtons();
+            document.getElementById('pagination-top').innerHTML = paginationHTML;
+            document.getElementById('pagination-bottom').innerHTML = paginationHTML;
+        }
+
+        function createPaginationButtons() {
+            let html = '';
+
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage - 1})">← Anterior</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>← Anterior</button>`;
+            }
+
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesButtons - 1);
+
+            if (endPage - startPage < maxPagesButtons - 1) {
+                startPage = Math.max(1, endPage - maxPagesButtons + 1);
+            }
+
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    html += `<span class="page-info">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    html += `<button class="page-btn active">${i}</button>`;
+                } else {
+                    html += `<button class="page-btn" onclick="changePage(${i})">${i}</button>`;
+                }
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span class="page-info">...</span>`;
+                }
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage + 1})")>Siguiente →</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>Siguiente →</button>`;
+            }
+
+            return html;
+        }
+
+        function changePage(pageNum) {
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                loadPage(pageNum);
+            }
+        }
+
+        loadListenedItems();
+        console.log('Datos cargados:', Object.keys(allPagesData).length, 'páginas');
+        loadPage(1);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changePage(currentPage - 1);
+            } else if (e.key === 'ArrowRight') {
+                changePage(currentPage + 1);
+            }
+        });
+    </script>
+    <script src="theme-picker.js"></script>
+    <script src="settings-panel.js"></script>
+</body>
+</html>

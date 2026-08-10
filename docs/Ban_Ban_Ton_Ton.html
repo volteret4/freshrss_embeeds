@@ -4,7 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ban Ban Ton Ton - Embeds</title>
+    <link rel="stylesheet" href="theme-palettes.css">
     <style>
+        [data-theme="og"], :root:not([data-theme]) {
+            --bg: #1f1f28;
+            --surface: #2a2a37;
+            --surface-2: #16161d;
+            --border: #54546d;
+            --text: #dcd7ba;
+            --text-muted: #938aa9;
+            --accent: #7e9cd8;
+            --accent-2: #957fb8;
+            --success: #76946a;
+            --warning: #c8c093;
+            --danger: #e46876;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +28,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1f1f28;
+            background: var(--bg);
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,14 +44,14 @@
         }
 
         h1 {
-            color: #dcd7ba;
+            color: var(--text);
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .stats {
-            color: #c8c093;
+            color: var(--warning);
             font-size: 1.1em;
         }
 
@@ -48,17 +63,90 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
             .embeds-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            header {
+                margin-bottom: 24px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                overflow-wrap: break-word;
+            }
+
+            .embed-item {
+                padding: 16px;
+            }
+
+            .pagination {
+                gap: 8px;
+                margin: 24px 0;
+            }
+
+            .page-btn,
+            .listen-btn {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-info {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .stats {
+                font-size: 1em;
+            }
+
+            .embed-item {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .embed-info h3 {
+                font-size: 1em;
+            }
+
+            .page-btn {
+                padding: 10px 14px;
+                font-size: 0.95em;
+            }
+
+            .pagination {
+                gap: 6px;
             }
         }
 
         .embed-item {
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+            /* Sin esto, un grid item no encoge por debajo del ancho de su
+               contenido (min-width: auto por defecto) y un título largo sin
+               espacios fuerza scroll horizontal en pantallas estrechas. */
+            min-width: 0;
         }
 
         .embed-item:hover {
@@ -68,7 +156,7 @@
 
         .embed-item.listened {
             opacity: 0.4;
-            background: #1a1a22;
+            background: var(--surface-2);
         }
 
         .embed-item.listened:hover {
@@ -87,26 +175,28 @@
 
         .embed-info h3 {
             font-size: 1.1em;
-            color: #dcd7ba;
+            color: var(--text);
             margin-bottom: 10px;
             line-height: 1.4;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .embed-info .meta {
             font-size: 0.9em;
-            color: #938aa9;
+            color: var(--text-muted);
             margin-bottom: 8px;
         }
 
         .embed-info a {
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
             font-size: 0.9em;
         }
 
         .embed-info a:hover {
             text-decoration: underline;
-            color: #957fb8;
+            color: var(--accent-2);
         }
 
         .embed-container {
@@ -120,11 +210,20 @@
             max-width: 100%;
         }
 
+        /* Los embeds de YouTube traen width/height fijos (560x315) en el
+           <iframe>; forzamos proporción 16:9 fluida para que no queden
+           recortados ni deformados al encogerse en pantallas estrechas. */
+        .embed-container iframe[src*="youtube"] {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
         .listen-btn {
             margin-top: 15px;
             padding: 10px 20px;
-            background: #7e9cd8;
-            color: #1f1f28;
+            background: var(--accent);
+            color: var(--bg);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -135,13 +234,13 @@
         }
 
         .listen-btn:hover {
-            background: #957fb8;
+            background: var(--accent-2);
             transform: translateY(-2px);
         }
 
         .listen-btn.listened {
-            background: #54546d;
-            color: #938aa9;
+            background: var(--border);
+            color: var(--text-muted);
         }
 
         .listen-btn.listened:hover {
@@ -159,8 +258,8 @@
 
         .page-btn {
             padding: 10px 20px;
-            background: #54546d;
-            color: #dcd7ba;
+            background: var(--border);
+            color: var(--text);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -173,30 +272,30 @@
         }
 
         .page-btn:disabled {
-            background: #2a2a37;
-            color: #54546d;
+            background: var(--surface);
+            color: var(--border);
             cursor: not-allowed;
         }
 
         .page-btn.active {
-            background: #7e9cd8;
-            color: #1f1f28;
+            background: var(--accent);
+            color: var(--bg);
             font-weight: bold;
         }
 
         .page-info {
             padding: 10px 20px;
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 8px;
             font-weight: 600;
-            color: #c8c093;
+            color: var(--warning);
         }
 
         .loading {
             text-align: center;
             padding: 40px;
             font-size: 1.2em;
-            color: #938aa9;
+            color: var(--text-muted);
         }
 
         .loading::after {
@@ -214,12 +313,12 @@
             text-align: center;
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 2px solid #2a2a37;
-            color: #938aa9;
+            border-top: 2px solid var(--surface);
+            color: var(--text-muted);
         }
 
         footer a {
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
         }
 
@@ -233,7 +332,7 @@
         <header>
             <h1>Ban Ban Ton Ton</h1>
             <div class="stats">
-                Total: 764 embeds únicos | Páginas: 96
+                Total: 771 embeds únicos | Páginas: 97
             </div>
         </header>
 
@@ -252,6 +351,77 @@
   "1": [
     {
       "type": "bandcamp",
+      "url": "https://kifproductions.bandcamp.com/album/music-to-watch-seeds-grow-by-010-kif-productions-passiflora",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3987499294/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "album_3987499294"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/qexS5hBB1C0",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "https://www.youtube.com/embed/qexS5hBB1C0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/VGrDS7EFqbw",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "https://www.youtube.com/embed/VGrDS7EFqbw"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/STugQ0X1NoI",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "https://www.youtube.com/embed/STugQ0X1NoI"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/_F12W_BvbwI",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "https://www.youtube.com/embed/_F12W_BvbwI"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/qQNX2_-hlFY",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "https://www.youtube.com/embed/qQNX2_-hlFY"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/KNYW276VxPQ",
+      "title": "KiF Productions / Passiflora / Music To Watch Seeds Grow By",
+      "article_link": "https://banbantonton.com/2026/08/10/kif-productions-passiflora-music-to-watch-seeds-grow-by/",
+      "author": "Banbantonton Com",
+      "feed": "Ban Ban Ton Ton",
+      "date": "2026-08-10 00:01",
+      "id": "https://www.youtube.com/embed/KNYW276VxPQ"
+    },
+    {
+      "type": "bandcamp",
       "url": "https://mytron.bandcamp.com/album/propeller",
       "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4226576842/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
       "title": "Mytron / Propeller / Multi Culti",
@@ -260,7 +430,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-05 01:01",
       "id": "album_4226576842"
-    },
+    }
+  ],
+  "2": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/VONQjIzeHiU",
@@ -331,9 +503,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-03 01:01",
       "id": "https://www.youtube.com/embed/2A4MVHTeGgo"
-    }
-  ],
-  "2": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/NUpPqfstS_U",
@@ -343,7 +513,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-03 01:01",
       "id": "https://www.youtube.com/embed/NUpPqfstS_U"
-    },
+    }
+  ],
+  "3": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/cS0UPXvDnN8",
@@ -414,9 +586,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-02 01:01",
       "id": "https://www.youtube.com/embed/4VUt5ppR_6Y"
-    }
-  ],
-  "3": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/rioTBPzgqXs",
@@ -426,7 +596,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-02 01:01",
       "id": "https://www.youtube.com/embed/rioTBPzgqXs"
-    },
+    }
+  ],
+  "4": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Q6buNGDoYUY",
@@ -502,9 +674,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-01 01:01",
       "id": "album_3998025552"
-    }
-  ],
-  "4": [
+    },
     {
       "type": "bandcamp",
       "url": "https://fourfliesrecords.bandcamp.com/album/sei",
@@ -515,7 +685,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-02-01 01:01",
       "id": "album_1576837227"
-    },
+    }
+  ],
+  "5": [
     {
       "type": "bandcamp",
       "url": "https://45trio.bandcamp.com/album/tenorio-c-w-nebulosa",
@@ -589,9 +761,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-29 01:01",
       "id": "track_1975804990"
-    }
-  ],
-  "5": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/CvqNC4TLn7k",
@@ -601,7 +771,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-29 01:01",
       "id": "https://www.youtube.com/embed/CvqNC4TLn7k"
-    },
+    }
+  ],
+  "6": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/_p3G9i78GnA",
@@ -672,9 +844,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "album_764167201"
-    }
-  ],
-  "6": [
+    },
     {
       "type": "bandcamp",
       "url": "https://drownedbylocals.bandcamp.com/album/pornographic-time-vol-i-the-pornographic-tantalus",
@@ -685,7 +855,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "album_2577699668"
-    },
+    }
+  ],
+  "7": [
     {
       "type": "bandcamp",
       "url": "https://thesenewpuritans.bandcamp.com/album/the-other-side",
@@ -762,9 +934,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "album_1664899150"
-    }
-  ],
-  "7": [
+    },
     {
       "type": "bandcamp",
       "url": "https://invisible-inc.bandcamp.com/album/resonance-10-years-of-vibrational-sounds-from-the-heart-of-invisible-inc",
@@ -775,7 +945,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "album_1865651874"
-    },
+    }
+  ],
+  "8": [
     {
       "type": "bandcamp",
       "url": "https://paisleydarkrecords.bandcamp.com/album/like-fire",
@@ -852,9 +1024,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "album_749594427"
-    }
-  ],
-  "8": [
+    },
     {
       "type": "bandcamp",
       "url": "https://night-school.bandcamp.com/album/all-the-young-droids-junkshop-synth-pop-1978-1985",
@@ -865,7 +1035,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "album_1068408952"
-    },
+    }
+  ],
+  "9": [
     {
       "type": "bandcamp",
       "url": "https://getdownservices.bandcamp.com/track/drifting-away",
@@ -941,9 +1113,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "https://www.youtube.com/embed/Hh_X7KZLbJs"
-    }
-  ],
-  "9": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/e5pwsETshBk",
@@ -953,7 +1123,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "https://www.youtube.com/embed/e5pwsETshBk"
-    },
+    }
+  ],
+  "10": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/xRV_lQTNwsk",
@@ -1023,9 +1195,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-28 01:01",
       "id": "https://www.youtube.com/embed/F6Y7lcvubhU"
-    }
-  ],
-  "10": [
+    },
     {
       "type": "bandcamp",
       "url": "https://nathandawidowicz.bandcamp.com/album/fluff-2",
@@ -1036,7 +1206,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-27 01:01",
       "id": "album_119284074"
-    },
+    }
+  ],
+  "11": [
     {
       "type": "bandcamp",
       "url": "https://djoil.bandcamp.com/album/reserve",
@@ -1111,9 +1283,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-26 01:01",
       "id": "album_1753893230"
-    }
-  ],
-  "11": [
+    },
     {
       "type": "bandcamp",
       "url": "https://markstewartmusic.bandcamp.com/track/everybody-s-got-to-learn-sometime-b-be-durmiendo-cumbia-bootleg",
@@ -1124,7 +1294,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-26 01:01",
       "id": "track_3643369718"
-    },
+    }
+  ],
+  "12": [
     {
       "type": "bandcamp",
       "url": "https://trule.bandcamp.com/album/ambulance",
@@ -1201,9 +1373,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-26 01:01",
       "id": "album_2443737574"
-    }
-  ],
-  "12": [
+    },
     {
       "type": "bandcamp",
       "url": "https://thealienduborchestra.bandcamp.com/album/plays-the-breadminster-songbook",
@@ -1214,7 +1384,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-26 01:01",
       "id": "album_3603911695"
-    },
+    }
+  ],
+  "13": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/vJ1muA-q0Z8",
@@ -1284,9 +1456,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-25 01:01",
       "id": "https://www.youtube.com/embed/NC1ii5FXd00"
-    }
-  ],
-  "13": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/OpPqb534GjI",
@@ -1296,7 +1466,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-25 01:01",
       "id": "https://www.youtube.com/embed/OpPqb534GjI"
-    },
+    }
+  ],
+  "14": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/YkjxgaUbCo0",
@@ -1366,9 +1538,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-25 01:01",
       "id": "https://www.youtube.com/embed/IfApxtT2iUg"
-    }
-  ],
-  "14": [
+    },
     {
       "type": "bandcamp",
       "url": "https://calm.bandcamp.com/album/ambient-jazz",
@@ -1379,7 +1549,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-24 01:01",
       "id": "album_177236747"
-    },
+    }
+  ],
+  "15": [
     {
       "type": "bandcamp",
       "url": "https://djkoze.bandcamp.com/track/umaoi-feat-marewrew",
@@ -1450,9 +1622,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-23 01:02",
       "id": "https://www.youtube.com/embed/1ozG76lKLz4"
-    }
-  ],
-  "15": [
+    },
     {
       "type": "soundcloud",
       "url": "https://soundcloud.com/akio-nagase/sakaki-mangolimba-train-sound-system-masterfeel-cumbiacid-edit",
@@ -1462,7 +1632,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-23 01:02",
       "id": "https://soundcloud.com/akio-nagase/sakaki-mangolimba-train-sound-system-masterfeel-cumbiacid-edit"
-    },
+    }
+  ],
+  "16": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/J9Ks3-GKk00",
@@ -1538,9 +1710,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-21 01:01",
       "id": "album_3392243474"
-    }
-  ],
-  "16": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/S6meuU1DyOo",
@@ -1550,7 +1720,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-21 01:01",
       "id": "https://www.youtube.com/embed/S6meuU1DyOo"
-    },
+    }
+  ],
+  "17": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/WCnVx2OdHS4",
@@ -1624,9 +1796,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-20 01:01",
       "id": "album_1106201570"
-    }
-  ],
-  "17": [
+    },
     {
       "type": "bandcamp",
       "url": "https://mrbongo.bandcamp.com/track/jingo-luke-unas-dancing-in-outer-space-edit",
@@ -1637,7 +1807,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-20 01:01",
       "id": "track_3709886436"
-    },
+    }
+  ],
+  "18": [
     {
       "type": "bandcamp",
       "url": "https://darklyinclinedtapes.bandcamp.com/album/iv-of-cups",
@@ -1714,9 +1886,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-20 01:01",
       "id": "album_808607904"
-    }
-  ],
-  "18": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/jIvNu8i6fIM",
@@ -1726,7 +1896,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-20 01:01",
       "id": "https://www.youtube.com/embed/jIvNu8i6fIM"
-    },
+    }
+  ],
+  "19": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/SE3BnZRD2Hw",
@@ -1798,9 +1970,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-19 01:01",
       "id": "https://www.youtube.com/embed/U7GFwKPs3lo"
-    }
-  ],
-  "19": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/FEeoLk2ATcI",
@@ -1810,7 +1980,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-19 01:01",
       "id": "https://www.youtube.com/embed/FEeoLk2ATcI"
-    },
+    }
+  ],
+  "20": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Z7TJUPzuNKU",
@@ -1881,9 +2053,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-18 01:01",
       "id": "https://www.youtube.com/embed/BQo1SfRQGHo"
-    }
-  ],
-  "20": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/iysGj5JcX0s",
@@ -1893,7 +2063,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-18 01:01",
       "id": "https://www.youtube.com/embed/iysGj5JcX0s"
-    },
+    }
+  ],
+  "21": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/KssW5hUZuio",
@@ -1963,9 +2135,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-18 01:01",
       "id": "https://www.youtube.com/embed/wGsroT2dR1U"
-    }
-  ],
-  "21": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/mlBRi1qs2qE",
@@ -1975,7 +2145,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-18 01:01",
       "id": "https://www.youtube.com/embed/mlBRi1qs2qE"
-    },
+    }
+  ],
+  "22": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/iliZs3K1sY8",
@@ -2048,9 +2220,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-17 01:01",
       "id": "album_1154748570"
-    }
-  ],
-  "22": [
+    },
     {
       "type": "bandcamp",
       "url": "https://celinedessberg.bandcamp.com/album/selenge-chintamani",
@@ -2061,7 +2231,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-17 01:01",
       "id": "album_3801531154"
-    },
+    }
+  ],
+  "23": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/iwc4s1HIeiw",
@@ -2134,9 +2306,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-16 01:01",
       "id": "album_1902195746"
-    }
-  ],
-  "23": [
+    },
     {
       "type": "bandcamp",
       "url": "https://toptape1.bandcamp.com/album/more-love-songs-2006-2024",
@@ -2147,7 +2317,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-16 01:01",
       "id": "album_1756361453"
-    },
+    }
+  ],
+  "24": [
     {
       "type": "bandcamp",
       "url": "https://yassokiiba.bandcamp.com/album/dub-5-dub-3",
@@ -2224,9 +2396,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-16 01:01",
       "id": "album_396719841"
-    }
-  ],
-  "24": [
+    },
     {
       "type": "bandcamp",
       "url": "https://traceyisyourfriend.bandcamp.com/album/tracey-ep",
@@ -2237,7 +2407,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-16 01:01",
       "id": "album_3936682939"
-    },
+    }
+  ],
+  "25": [
     {
       "type": "bandcamp",
       "url": "https://klangkollektor.bandcamp.com/album/klangkollektor-stockport-tapes",
@@ -2314,9 +2486,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-16 01:01",
       "id": "album_3082749355"
-    }
-  ],
-  "25": [
+    },
     {
       "type": "bandcamp",
       "url": "https://makyo.bandcamp.com/album/things-ah-get-tuff",
@@ -2327,7 +2497,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-16 01:01",
       "id": "album_3720636509"
-    },
+    }
+  ],
+  "26": [
     {
       "type": "bandcamp",
       "url": "https://jehnnybeth.bandcamp.com/album/you-heartbreaker-you",
@@ -2402,9 +2574,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-15 01:01",
       "id": "https://www.youtube.com/embed/CApDGihHi9Y"
-    }
-  ],
-  "26": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/nXFM81b-gBk",
@@ -2414,7 +2584,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-15 01:01",
       "id": "https://www.youtube.com/embed/nXFM81b-gBk"
-    },
+    }
+  ],
+  "27": [
     {
       "type": "bandcamp",
       "url": "https://snappedankles.bandcamp.com/album/hard-times-furious-dancing",
@@ -2491,9 +2663,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-14 01:01",
       "id": "album_3869476632"
-    }
-  ],
-  "27": [
+    },
     {
       "type": "bandcamp",
       "url": "https://coastalcounty.bandcamp.com/album/coastal-county-ii",
@@ -2504,7 +2674,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-14 01:01",
       "id": "album_2080155313"
-    },
+    }
+  ],
+  "28": [
     {
       "type": "bandcamp",
       "url": "https://move78.bandcamp.com/track/in-the-age-of-data",
@@ -2575,9 +2747,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-14 01:01",
       "id": "https://www.youtube.com/embed/BrLQkbnBK7w"
-    }
-  ],
-  "28": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/cdMEd2IR2k8",
@@ -2587,7 +2757,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-14 01:01",
       "id": "https://www.youtube.com/embed/cdMEd2IR2k8"
-    },
+    }
+  ],
+  "29": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/4Rz-d0AGLj4",
@@ -2661,9 +2833,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-13 01:01",
       "id": "album_3586179242"
-    }
-  ],
-  "29": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/ghSEpOiyg08",
@@ -2673,7 +2843,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-13 01:01",
       "id": "https://www.youtube.com/embed/ghSEpOiyg08"
-    },
+    }
+  ],
+  "30": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/3agoQJ-KEeI",
@@ -2745,9 +2917,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-11 04:11",
       "id": "https://www.youtube.com/embed/uG7eRgTwkck"
-    }
-  ],
-  "30": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/tGXszMUQXxI",
@@ -2757,7 +2927,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-11 04:11",
       "id": "https://www.youtube.com/embed/tGXszMUQXxI"
-    },
+    }
+  ],
+  "31": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/04-cyf7BdfI",
@@ -2832,9 +3004,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_992729753"
-    }
-  ],
-  "31": [
+    },
     {
       "type": "bandcamp",
       "url": "https://oberlin.bandcamp.com/album/ten-more-dreamwebs",
@@ -2845,7 +3015,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_3909853853"
-    },
+    }
+  ],
+  "32": [
     {
       "type": "bandcamp",
       "url": "https://plangentrecords.bandcamp.com/album/daemmerlicht",
@@ -2922,9 +3094,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_2795000345"
-    }
-  ],
-  "32": [
+    },
     {
       "type": "bandcamp",
       "url": "https://thefunyears.bandcamp.com/album/baby-its-cold-inside-2025-remaster",
@@ -2935,7 +3105,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_114552085"
-    },
+    }
+  ],
+  "33": [
     {
       "type": "bandcamp",
       "url": "https://mississippirecords.bandcamp.com/album/inzovu-yimirindi",
@@ -3012,9 +3184,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_41216582"
-    }
-  ],
-  "33": [
+    },
     {
       "type": "bandcamp",
       "url": "https://balmat.bandcamp.com/album/duvet",
@@ -3025,7 +3195,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_1033190631"
-    },
+    }
+  ],
+  "34": [
     {
       "type": "bandcamp",
       "url": "https://pitp.bandcamp.com/album/atmospherics-30th-anniversary-edition",
@@ -3102,9 +3274,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_2440274256"
-    }
-  ],
-  "34": [
+    },
     {
       "type": "bandcamp",
       "url": "https://frimpong.bandcamp.com/album/the-blue-album",
@@ -3115,7 +3285,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_1844457768"
-    },
+    }
+  ],
+  "35": [
     {
       "type": "bandcamp",
       "url": "https://mikemajkowski.bandcamp.com/album/invisible",
@@ -3192,9 +3364,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_796859934"
-    }
-  ],
-  "35": [
+    },
     {
       "type": "bandcamp",
       "url": "https://mabuimusic.bandcamp.com/album/camera-uno",
@@ -3205,7 +3375,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-10 08:18",
       "id": "album_3736505918"
-    },
+    }
+  ],
+  "36": [
     {
       "type": "bandcamp",
       "url": "https://thehumblebee.bandcamp.com/album/morning-music-2",
@@ -3279,9 +3451,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-09 01:01",
       "id": "https://www.youtube.com/embed/EapAztdrF-8"
-    }
-  ],
-  "36": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/R7uC5m-IRns",
@@ -3291,7 +3461,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-09 01:01",
       "id": "https://www.youtube.com/embed/R7uC5m-IRns"
-    },
+    }
+  ],
+  "37": [
     {
       "type": "bandcamp",
       "url": "https://dominikeulberg.bandcamp.com/album/lepidoptera",
@@ -3368,9 +3540,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-08 01:01",
       "id": "track_1998490983"
-    }
-  ],
-  "37": [
+    },
     {
       "type": "bandcamp",
       "url": "https://djrum.bandcamp.com/track/a-tune-for-us",
@@ -3381,7 +3551,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-08 01:01",
       "id": "track_2295835614"
-    },
+    }
+  ],
+  "38": [
     {
       "type": "bandcamp",
       "url": "https://kaitlynaureliasmith.bandcamp.com/track/i-miss-the-way-you-swim",
@@ -3453,9 +3625,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-07 01:01",
       "id": "https://www.youtube.com/embed/SuwdbvhqUow"
-    }
-  ],
-  "38": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/3KCbqhJt16k",
@@ -3465,7 +3635,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-02 01:01",
       "id": "https://www.youtube.com/embed/3KCbqhJt16k"
-    },
+    }
+  ],
+  "39": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/jtCNbERKvMs",
@@ -3535,9 +3707,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-02 01:01",
       "id": "https://www.youtube.com/embed/nwATF5dnfq4"
-    }
-  ],
-  "39": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/AR3Al4hPKYs",
@@ -3547,7 +3717,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-02 01:01",
       "id": "https://www.youtube.com/embed/AR3Al4hPKYs"
-    },
+    }
+  ],
+  "40": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/UFLJFl7ws_0",
@@ -3617,9 +3789,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-01 01:01",
       "id": "https://www.youtube.com/embed/GJg3AmVu-p0"
-    }
-  ],
-  "40": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/XcMM5-zBCEc",
@@ -3629,7 +3799,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-01 01:01",
       "id": "https://www.youtube.com/embed/XcMM5-zBCEc"
-    },
+    }
+  ],
+  "41": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/WAN6GLy79iY",
@@ -3699,9 +3871,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-01 01:01",
       "id": "https://www.youtube.com/embed/9HPEqIIR7_8"
-    }
-  ],
-  "41": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/PNdMvW75LaE",
@@ -3711,7 +3881,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2026-01-01 01:01",
       "id": "https://www.youtube.com/embed/PNdMvW75LaE"
-    },
+    }
+  ],
+  "42": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/cWOQB69akiw",
@@ -3782,9 +3954,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-31 01:01",
       "id": "https://www.youtube.com/embed/Dwtck37allE"
-    }
-  ],
-  "42": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/1T3c3TapNj8",
@@ -3794,7 +3964,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-31 01:01",
       "id": "https://www.youtube.com/embed/1T3c3TapNj8"
-    },
+    }
+  ],
+  "43": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/kmyxs0WYfQ4",
@@ -3867,9 +4039,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_4103386959"
-    }
-  ],
-  "43": [
+    },
     {
       "type": "bandcamp",
       "url": "https://mataharisons.bandcamp.com/album/beyond",
@@ -3880,7 +4050,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_261711152"
-    },
+    }
+  ],
+  "44": [
     {
       "type": "bandcamp",
       "url": "https://ilhanersahin.bandcamp.com/album/istanbul-sessions-mahalle-2",
@@ -3957,9 +4129,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_3593887776"
-    }
-  ],
-  "44": [
+    },
     {
       "type": "bandcamp",
       "url": "https://soundwayrecords.bandcamp.com/album/got-to-be-me",
@@ -3970,7 +4140,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_2598946698"
-    },
+    }
+  ],
+  "45": [
     {
       "type": "bandcamp",
       "url": "https://dreamchimney.bandcamp.com/album/sunlight-hits",
@@ -4047,9 +4219,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_311332128"
-    }
-  ],
-  "45": [
+    },
     {
       "type": "bandcamp",
       "url": "https://arabustarecords.bandcamp.com/album/jacinta-sanches-pedro-ramos",
@@ -4060,7 +4230,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_2310287003"
-    },
+    }
+  ],
+  "46": [
     {
       "type": "bandcamp",
       "url": "https://favoriterecordings.bandcamp.com/album/pretty-close",
@@ -4137,9 +4309,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_494278827"
-    }
-  ],
-  "46": [
+    },
     {
       "type": "bandcamp",
       "url": "https://ancientinfinityorchestra.bandcamp.com/album/its-always-about-love",
@@ -4150,7 +4320,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-29 01:01",
       "id": "album_2495580525"
-    },
+    }
+  ],
+  "47": [
     {
       "type": "bandcamp",
       "url": "https://babon.bandcamp.com/album/tropical-desert",
@@ -4224,9 +4396,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-27 01:01",
       "id": "https://www.youtube.com/embed/AnSrw8rE-dU"
-    }
-  ],
-  "47": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/u-X_Zb5xo-o",
@@ -4236,7 +4406,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-27 01:01",
       "id": "https://www.youtube.com/embed/u-X_Zb5xo-o"
-    },
+    }
+  ],
+  "48": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/p8JWQs1fqxw",
@@ -4306,9 +4478,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-27 01:01",
       "id": "https://www.youtube.com/embed/6onPpI92CF8"
-    }
-  ],
-  "48": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/2Fniz2D0rY0",
@@ -4318,7 +4488,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-27 01:01",
       "id": "https://www.youtube.com/embed/2Fniz2D0rY0"
-    },
+    }
+  ],
+  "49": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/bM1AetLXy4s",
@@ -4388,9 +4560,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-25 01:01",
       "id": "https://www.youtube.com/embed/-i8djfurMVQ"
-    }
-  ],
-  "49": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/4JYC3SwxDL4",
@@ -4400,7 +4570,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-25 01:01",
       "id": "https://www.youtube.com/embed/4JYC3SwxDL4"
-    },
+    }
+  ],
+  "50": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/lEmLqH2gTd8",
@@ -4474,9 +4646,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-23 01:01",
       "id": "album_4191052194"
-    }
-  ],
-  "50": [
+    },
     {
       "type": "bandcamp",
       "url": "https://alexiro.bandcamp.com/track/mariposa",
@@ -4487,7 +4657,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-23 01:01",
       "id": "track_3549639512"
-    },
+    }
+  ],
+  "51": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/cYlZrZHhI2I",
@@ -4559,9 +4731,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-19 01:01",
       "id": "album_4240661827"
-    }
-  ],
-  "51": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/LtBZhnB1_Rg",
@@ -4571,7 +4741,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-19 01:01",
       "id": "https://www.youtube.com/embed/LtBZhnB1_Rg"
-    },
+    }
+  ],
+  "52": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/zhNMeAg2CU8",
@@ -4643,9 +4815,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-18 01:01",
       "id": "album_3327123704"
-    }
-  ],
-  "52": [
+    },
     {
       "type": "bandcamp",
       "url": "https://declanmcdermott.bandcamp.com/album/doin-it-all-for-you",
@@ -4656,7 +4826,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-18 01:01",
       "id": "album_581689028"
-    },
+    }
+  ],
+  "53": [
     {
       "type": "bandcamp",
       "url": "https://razor-n-tape.bandcamp.com/album/family-affair-vol-5",
@@ -4732,9 +4904,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-18 01:01",
       "id": "https://www.youtube.com/embed/RrMFe_1JsGM"
-    }
-  ],
-  "53": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/68xnbg2sdpQ",
@@ -4744,7 +4914,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-18 01:01",
       "id": "https://www.youtube.com/embed/68xnbg2sdpQ"
-    },
+    }
+  ],
+  "54": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/qfZhOaXR4QI",
@@ -4817,9 +4989,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-17 01:01",
       "id": "album_545329908"
-    }
-  ],
-  "54": [
+    },
     {
       "type": "bandcamp",
       "url": "https://pleasureoflove.bandcamp.com/album/once-bitten",
@@ -4830,7 +5000,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-17 01:01",
       "id": "album_2898030420"
-    },
+    }
+  ],
+  "55": [
     {
       "type": "bandcamp",
       "url": "https://philkieran.bandcamp.com/album/echo-spiegel",
@@ -4906,9 +5078,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-17 01:01",
       "id": "https://www.youtube.com/embed/QAR8cq5Bl94"
-    }
-  ],
-  "55": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/KmUjrInzqxY",
@@ -4918,7 +5088,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-17 01:01",
       "id": "https://www.youtube.com/embed/KmUjrInzqxY"
-    },
+    }
+  ],
+  "56": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/PUJMs-8o8PA",
@@ -4988,9 +5160,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-17 01:01",
       "id": "https://www.youtube.com/embed/JkOS3cLfCBo"
-    }
-  ],
-  "56": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/VsG2_465Srs",
@@ -5000,7 +5170,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-17 01:01",
       "id": "https://www.youtube.com/embed/VsG2_465Srs"
-    },
+    }
+  ],
+  "57": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/oIIcrT75Nko",
@@ -5072,9 +5244,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-15 01:01",
       "id": "https://www.youtube.com/embed/gX9CKkoPX-Y"
-    }
-  ],
-  "57": [
+    },
     {
       "type": "bandcamp",
       "url": "https://sewellandthegong.bandcamp.com/album/remixes-part-2",
@@ -5085,7 +5255,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-13 01:01",
       "id": "album_41950037"
-    },
+    }
+  ],
+  "58": [
     {
       "type": "bandcamp",
       "url": "https://frederiksbergrecords.bandcamp.com/album/windsong-1",
@@ -5162,9 +5334,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-11 01:01",
       "id": "album_2005538467"
-    }
-  ],
-  "58": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/tiNs0Zn-pQI",
@@ -5174,7 +5344,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-11 01:01",
       "id": "https://www.youtube.com/embed/tiNs0Zn-pQI"
-    },
+    }
+  ],
+  "59": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/EKOeXM9aSKk",
@@ -5245,9 +5417,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-09 01:01",
       "id": "https://www.youtube.com/embed/VJ0axgeNbWU"
-    }
-  ],
-  "59": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/3hPM7B1t7UM",
@@ -5257,7 +5427,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-09 01:01",
       "id": "https://www.youtube.com/embed/3hPM7B1t7UM"
-    },
+    }
+  ],
+  "60": [
     {
       "type": "bandcamp",
       "url": "https://hashmandeejay.bandcamp.com/album/musicentrydelete-selfless",
@@ -5332,9 +5504,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-04 01:01",
       "id": "album_1881652386"
-    }
-  ],
-  "60": [
+    },
     {
       "type": "bandcamp",
       "url": "https://mikeparadinas.bandcamp.com/album/1979",
@@ -5345,7 +5515,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-04 01:01",
       "id": "album_3863463080"
-    },
+    }
+  ],
+  "61": [
     {
       "type": "bandcamp",
       "url": "https://efficientspace.bandcamp.com/album/syncretic",
@@ -5420,9 +5592,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-02 01:01",
       "id": "https://www.youtube.com/embed/X6ymVaq3Fqk"
-    }
-  ],
-  "61": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/m6BQKFs3-VM",
@@ -5432,7 +5602,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-12-02 01:01",
       "id": "https://www.youtube.com/embed/m6BQKFs3-VM"
-    },
+    }
+  ],
+  "62": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/W9WUT4FD9-g",
@@ -5505,9 +5677,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-28 01:01",
       "id": "album_1505162819"
-    }
-  ],
-  "62": [
+    },
     {
       "type": "bandcamp",
       "url": "https://chazjankel.bandcamp.com/album/rhumba-jam",
@@ -5518,7 +5688,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-28 01:01",
       "id": "album_1030266661"
-    },
+    }
+  ],
+  "63": [
     {
       "type": "bandcamp",
       "url": "https://arto-arto.bandcamp.com/track/canto-de-p-jaro",
@@ -5592,9 +5764,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-28 01:01",
       "id": "https://www.youtube.com/embed/R4sx5ChCyYY"
-    }
-  ],
-  "63": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/A9dJWO25VB4",
@@ -5604,7 +5774,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-28 01:01",
       "id": "https://www.youtube.com/embed/A9dJWO25VB4"
-    },
+    }
+  ],
+  "64": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/alBhkEVrxBY",
@@ -5674,9 +5846,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-28 01:01",
       "id": "https://www.youtube.com/embed/b0Jwf-Y1uww"
-    }
-  ],
-  "64": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/5u-xBA9nE_c",
@@ -5686,7 +5856,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-27 01:01",
       "id": "https://www.youtube.com/embed/5u-xBA9nE_c"
-    },
+    }
+  ],
+  "65": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/l_RfediFJFQ",
@@ -5756,9 +5928,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-27 01:01",
       "id": "https://www.youtube.com/embed/mmi60Bd4jSs"
-    }
-  ],
-  "65": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/bWatYLIHyW0",
@@ -5768,7 +5938,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-27 01:01",
       "id": "https://www.youtube.com/embed/bWatYLIHyW0"
-    },
+    }
+  ],
+  "66": [
     {
       "type": "bandcamp",
       "url": "https://breadminster.bandcamp.com/album/clams-as-a-main-meal",
@@ -5841,9 +6013,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-25 01:01",
       "id": "https://www.youtube.com/embed/SGSSQ-hJrlA"
-    }
-  ],
-  "66": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Xo6s1PulcEc",
@@ -5853,7 +6023,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-25 01:01",
       "id": "https://www.youtube.com/embed/Xo6s1PulcEc"
-    },
+    }
+  ],
+  "67": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Q-vzSIbJa3A",
@@ -5923,9 +6095,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-25 01:01",
       "id": "https://www.youtube.com/embed/HXU5Rxc3vBQ"
-    }
-  ],
-  "67": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/m_DVQ5GBmVk",
@@ -5935,7 +6105,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-25 01:01",
       "id": "https://www.youtube.com/embed/m_DVQ5GBmVk"
-    },
+    }
+  ],
+  "68": [
     {
       "type": "bandcamp",
       "url": "https://philkieran.bandcamp.com/album/le-carousel-were-all-gonna-hurt-hardwaybros-mix",
@@ -6008,9 +6180,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-24 01:01",
       "id": "https://www.youtube.com/embed/mgjHsQuHsHI"
-    }
-  ],
-  "68": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/tLxDRePUwEY",
@@ -6020,7 +6190,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-24 01:01",
       "id": "https://www.youtube.com/embed/tLxDRePUwEY"
-    },
+    }
+  ],
+  "69": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/-q1MMx9fwDQ",
@@ -6096,9 +6268,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-22 01:01",
       "id": "album_1829393012"
-    }
-  ],
-  "69": [
+    },
     {
       "type": "bandcamp",
       "url": "https://freerangerecords.bandcamp.com/album/can-we-try-remixes-ep",
@@ -6109,7 +6279,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-22 01:01",
       "id": "album_354864293"
-    },
+    }
+  ],
+  "70": [
     {
       "type": "bandcamp",
       "url": "https://badcolours.bandcamp.com/album/promise",
@@ -6181,9 +6353,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-22 01:01",
       "id": "https://www.youtube.com/embed/iM8CKiqPtLw"
-    }
-  ],
-  "70": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/WvTY0Ga2928",
@@ -6193,7 +6363,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-22 01:01",
       "id": "https://www.youtube.com/embed/WvTY0Ga2928"
-    },
+    }
+  ],
+  "71": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/UnSO29QHJPE",
@@ -6264,9 +6436,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-20 01:01",
       "id": "https://www.youtube.com/embed/mTKCKBu8CLI"
-    }
-  ],
-  "71": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/ucTg6rZJCu4",
@@ -6276,7 +6446,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-20 01:01",
       "id": "https://www.youtube.com/embed/ucTg6rZJCu4"
-    },
+    }
+  ],
+  "72": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/8dFr1nuQF2k",
@@ -6347,9 +6519,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-19 01:01",
       "id": "https://www.youtube.com/embed/deiWnZK-duM"
-    }
-  ],
-  "72": [
+    },
     {
       "type": "bandcamp",
       "url": "https://intlanthem.bandcamp.com/album/touch",
@@ -6360,7 +6530,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-18 01:01",
       "id": "album_835747164"
-    },
+    }
+  ],
+  "73": [
     {
       "type": "bandcamp",
       "url": "https://anjunachill.bandcamp.com/album/i-am-the-sun-you-are-the-moon-ep",
@@ -6435,9 +6607,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-13 01:01",
       "id": "album_2275393042"
-    }
-  ],
-  "73": [
+    },
     {
       "type": "bandcamp",
       "url": "https://winter-mcquinn.bandcamp.com/album/where-are-we-now",
@@ -6448,7 +6618,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-13 01:01",
       "id": "album_2044203667"
-    },
+    }
+  ],
+  "74": [
     {
       "type": "bandcamp",
       "url": "https://localdish.bandcamp.com/album/debbie-gaskin-eternal-love-combo-2",
@@ -6524,9 +6696,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-12 01:01",
       "id": "https://www.youtube.com/embed/InyT9Gyoz_o"
-    }
-  ],
-  "74": [
+    },
     {
       "type": "bandcamp",
       "url": "https://ikocherie.bandcamp.com/album/soft-centre",
@@ -6537,7 +6707,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-11 01:01",
       "id": "album_1627913729"
-    },
+    }
+  ],
+  "75": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/blJiqgW6G9w",
@@ -6609,9 +6781,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-06 01:05",
       "id": "https://www.youtube.com/embed/T0spQCw35D4"
-    }
-  ],
-  "75": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/HFWKJ2FUiAQ",
@@ -6621,7 +6791,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-06 01:05",
       "id": "https://www.youtube.com/embed/HFWKJ2FUiAQ"
-    },
+    }
+  ],
+  "76": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/3oS082HqfVE",
@@ -6691,9 +6863,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-06 01:05",
       "id": "https://www.youtube.com/embed/rx--j1F5Ppg"
-    }
-  ],
-  "76": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/ZCOSPtyZAPA",
@@ -6703,7 +6873,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-06 01:01",
       "id": "https://www.youtube.com/embed/ZCOSPtyZAPA"
-    },
+    }
+  ],
+  "77": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/sWMq-7JVR04",
@@ -6773,9 +6945,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-06 01:01",
       "id": "https://www.youtube.com/embed/1-GCBPDBDVI"
-    }
-  ],
-  "77": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/TUxFQ5QBiYk",
@@ -6785,7 +6955,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-06 01:01",
       "id": "https://www.youtube.com/embed/TUxFQ5QBiYk"
-    },
+    }
+  ],
+  "78": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/ym-Oz0TMSb0",
@@ -6855,9 +7027,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-05 01:01",
       "id": "https://www.youtube.com/embed/2UEOpaxwUMM"
-    }
-  ],
-  "78": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/l65wCr8LYEg",
@@ -6867,7 +7037,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-05 01:01",
       "id": "https://www.youtube.com/embed/l65wCr8LYEg"
-    },
+    }
+  ],
+  "79": [
     {
       "type": "bandcamp",
       "url": "https://iirisviljanenshop.bandcamp.com/album/so-much-of-you-was-sleeping",
@@ -6940,9 +7112,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-03 01:01",
       "id": "https://www.youtube.com/embed/vzvTvhgy00E"
-    }
-  ],
-  "79": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/TjIPzyVlK60",
@@ -6952,7 +7122,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-11-03 01:01",
       "id": "https://www.youtube.com/embed/TjIPzyVlK60"
-    },
+    }
+  ],
+  "80": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/QE6dWdQfFvM",
@@ -7023,9 +7195,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-30 01:01",
       "id": "https://www.youtube.com/embed/DUlXy-WHB78"
-    }
-  ],
-  "80": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Y_0guvM2DFM",
@@ -7035,7 +7205,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-30 01:01",
       "id": "https://www.youtube.com/embed/Y_0guvM2DFM"
-    },
+    }
+  ],
+  "81": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/ovwGCpx8ecY",
@@ -7106,9 +7278,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-29 01:02",
       "id": "https://www.youtube.com/embed/NNKA7i4i9GA"
-    }
-  ],
-  "81": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/pB2KJQxV7yM",
@@ -7118,7 +7288,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-29 01:02",
       "id": "https://www.youtube.com/embed/pB2KJQxV7yM"
-    },
+    }
+  ],
+  "82": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/nsxaMB0pRCM",
@@ -7190,9 +7362,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-28 01:01",
       "id": "album_2162189491"
-    }
-  ],
-  "82": [
+    },
     {
       "type": "bandcamp",
       "url": "https://nayabeat.bandcamp.com/album/punjabi-disco",
@@ -7203,7 +7373,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-28 01:01",
       "id": "album_3836386083"
-    },
+    }
+  ],
+  "83": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/j7vxHOCeiQ4",
@@ -7274,9 +7446,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-27 01:01",
       "id": "album_3924974086"
-    }
-  ],
-  "83": [
+    },
     {
       "type": "bandcamp",
       "url": "https://lukeschneider.bandcamp.com/album/a-companion-for-the-spaces-between-dreams",
@@ -7287,7 +7457,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-10-27 01:01",
       "id": "album_3859081547"
-    },
+    }
+  ],
+  "84": [
     {
       "type": "bandcamp",
       "url": "https://mrbongo.bandcamp.com/album/garoto-do-pife-homenagem-a-ludugero",
@@ -7360,9 +7532,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-28 02:01",
       "id": "https://www.youtube.com/embed/TShqOPS06Yc"
-    }
-  ],
-  "84": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/OkkFST5qrLg",
@@ -7372,7 +7542,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-28 02:01",
       "id": "https://www.youtube.com/embed/OkkFST5qrLg"
-    },
+    }
+  ],
+  "85": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/QmSWkQfl9Jg",
@@ -7442,9 +7614,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-28 02:01",
       "id": "https://www.youtube.com/embed/2GR4Qz3-PNo"
-    }
-  ],
-  "85": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/CVcdBwsMaIg",
@@ -7454,7 +7624,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-28 02:01",
       "id": "https://www.youtube.com/embed/CVcdBwsMaIg"
-    },
+    }
+  ],
+  "86": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/fCwDv_Gk6yk",
@@ -7524,9 +7696,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-27 02:01",
       "id": "https://www.youtube.com/embed/L-xfpXQs40I"
-    }
-  ],
-  "86": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/h8btcnNKQOM",
@@ -7536,7 +7706,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-27 02:01",
       "id": "https://www.youtube.com/embed/h8btcnNKQOM"
-    },
+    }
+  ],
+  "87": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/mbJ5CpDrSWw",
@@ -7606,9 +7778,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-27 02:01",
       "id": "https://www.youtube.com/embed/JFZfgZLNIXo"
-    }
-  ],
-  "87": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/OFlQH3Dme78",
@@ -7618,7 +7788,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-27 02:01",
       "id": "https://www.youtube.com/embed/OFlQH3Dme78"
-    },
+    }
+  ],
+  "88": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/8ew6piSWm-s",
@@ -7688,9 +7860,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-26 02:01",
       "id": "https://www.youtube.com/embed/OFmmcKXqXTI"
-    }
-  ],
-  "88": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/sdy6e-hUpJ4",
@@ -7700,7 +7870,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-26 02:01",
       "id": "https://www.youtube.com/embed/sdy6e-hUpJ4"
-    },
+    }
+  ],
+  "89": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/wBpSM6IXvcI",
@@ -7770,9 +7942,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-26 02:01",
       "id": "https://www.youtube.com/embed/_4MmrxUrJCk"
-    }
-  ],
-  "89": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/fge_E-hyvQg",
@@ -7782,7 +7952,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-25 02:01",
       "id": "https://www.youtube.com/embed/fge_E-hyvQg"
-    },
+    }
+  ],
+  "90": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/lI4MdxlMVzo",
@@ -7852,9 +8024,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-25 02:01",
       "id": "https://www.youtube.com/embed/AoiSjVBvpso"
-    }
-  ],
-  "90": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/3uFBThjrtnY",
@@ -7864,7 +8034,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-08-25 02:01",
       "id": "https://www.youtube.com/embed/3uFBThjrtnY"
-    },
+    }
+  ],
+  "91": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/-FDy-RVeI-A",
@@ -7935,9 +8107,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-18 02:01",
       "id": "https://www.youtube.com/embed/C_APX7Q-fWM"
-    }
-  ],
-  "91": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Dn7SBQ6X5HU",
@@ -7947,7 +8117,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-18 02:01",
       "id": "https://www.youtube.com/embed/Dn7SBQ6X5HU"
-    },
+    }
+  ],
+  "92": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Pd_Kti6jvy8",
@@ -8022,9 +8194,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-14 02:01",
       "id": "album_2949702433"
-    }
-  ],
-  "92": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/apBWI6xrbLY",
@@ -8034,7 +8204,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-11 02:01",
       "id": "https://www.youtube.com/embed/apBWI6xrbLY"
-    },
+    }
+  ],
+  "93": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/v3GPRIZw_J0",
@@ -8104,9 +8276,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-11 02:01",
       "id": "https://www.youtube.com/embed/M0lj3WX_5ps"
-    }
-  ],
-  "93": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/Uq_pGL3eNyI",
@@ -8116,7 +8286,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-11 02:01",
       "id": "https://www.youtube.com/embed/Uq_pGL3eNyI"
-    },
+    }
+  ],
+  "94": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/bp_8GKcNvdQ",
@@ -8186,9 +8358,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-10 02:01",
       "id": "https://www.youtube.com/embed/xvsZMSni7Ts"
-    }
-  ],
-  "94": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/ZUJuhIAPuNg",
@@ -8198,7 +8368,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-10 02:01",
       "id": "https://www.youtube.com/embed/ZUJuhIAPuNg"
-    },
+    }
+  ],
+  "95": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/t5NoS8Jc3dM",
@@ -8268,9 +8440,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-10 02:01",
       "id": "https://www.youtube.com/embed/_C1Za8U72Ww"
-    }
-  ],
-  "95": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/IvF7gXhKTQk",
@@ -8280,7 +8450,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-10 02:01",
       "id": "https://www.youtube.com/embed/IvF7gXhKTQk"
-    },
+    }
+  ],
+  "96": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/nAAAAqwFAcE",
@@ -8350,9 +8522,7 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-10 02:01",
       "id": "https://www.youtube.com/embed/s31eL8Y_pBM"
-    }
-  ],
-  "96": [
+    },
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/WPWxcTtnuX4",
@@ -8362,7 +8532,9 @@
       "feed": "Ban Ban Ton Ton",
       "date": "2025-07-10 02:01",
       "id": "https://www.youtube.com/embed/WPWxcTtnuX4"
-    },
+    }
+  ],
+  "97": [
     {
       "type": "youtube",
       "url": "https://www.youtube.com/embed/QD260LPqHKA",
@@ -8395,7 +8567,7 @@
     }
   ]
 };
-        const totalPages = 96;
+        const totalPages = 97;
         const maxPagesButtons = 15;
         const feedName = 'Ban_Ban_Ton_Ton';
         const storageKey = `freshrss_listened_${feedName}`;
@@ -8426,12 +8598,20 @@
             }
         }
 
-        // Marcar/desmarcar item como escuchado
+        // Marcar/desmarcar item como escuchado. Solo "marcar" se persiste en
+        // el servidor (SQLite, vía /api/listened) — el servidor no soporta
+        // desmarcar, así que "desmarcar" aquí es solo visual/local hasta la
+        // próxima regeneración.
         function toggleListened(itemId) {
             if (listenedItems.has(itemId)) {
                 listenedItems.delete(itemId);
             } else {
                 listenedItems.add(itemId);
+                fetch('/api/listened', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: itemId}),
+                }).catch(err => console.error('No se pudo guardar en el servidor:', err));
             }
             saveListenedItems();
             loadPage(currentPage);
@@ -8605,5 +8785,7 @@
             }
         });
     </script>
+    <script src="theme-picker.js"></script>
+    <script src="settings-panel.js"></script>
 </body>
 </html>

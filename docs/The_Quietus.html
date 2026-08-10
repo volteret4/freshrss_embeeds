@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quietus - Embeds</title>
+    <link rel="stylesheet" href="theme-palettes.css">
+    <style>
+        [data-theme="og"], :root:not([data-theme]) {
+            --bg: #1f1f28;
+            --surface: #2a2a37;
+            --surface-2: #16161d;
+            --border: #54546d;
+            --text: #dcd7ba;
+            --text-muted: #938aa9;
+            --accent: #7e9cd8;
+            --accent-2: #957fb8;
+            --success: #76946a;
+            --warning: #c8c093;
+            --danger: #e46876;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--text);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .stats {
+            color: var(--warning);
+            font-size: 1.1em;
+        }
+
+        .embeds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .embeds-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            header {
+                margin-bottom: 24px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                overflow-wrap: break-word;
+            }
+
+            .embed-item {
+                padding: 16px;
+            }
+
+            .pagination {
+                gap: 8px;
+                margin: 24px 0;
+            }
+
+            .page-btn,
+            .listen-btn {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-info {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .stats {
+                font-size: 1em;
+            }
+
+            .embed-item {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .embed-info h3 {
+                font-size: 1em;
+            }
+
+            .page-btn {
+                padding: 10px 14px;
+                font-size: 0.95em;
+            }
+
+            .pagination {
+                gap: 6px;
+            }
+        }
+
+        .embed-item {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+            /* Sin esto, un grid item no encoge por debajo del ancho de su
+               contenido (min-width: auto por defecto) y un título largo sin
+               espacios fuerza scroll horizontal en pantallas estrechas. */
+            min-width: 0;
+        }
+
+        .embed-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+        }
+
+        .embed-item.listened {
+            opacity: 0.4;
+            background: var(--surface-2);
+        }
+
+        .embed-item.listened:hover {
+            opacity: 0.6;
+        }
+
+        .embed-info {
+            margin-bottom: 15px;
+        }
+
+        .embed-type {
+            display: inline-block;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .embed-info h3 {
+            font-size: 1.1em;
+            color: var(--text);
+            margin-bottom: 10px;
+            line-height: 1.4;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .embed-info .meta {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .embed-info a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .embed-info a:hover {
+            text-decoration: underline;
+            color: var(--accent-2);
+        }
+
+        .embed-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .embed-container iframe {
+            max-width: 100%;
+        }
+
+        /* Los embeds de YouTube traen width/height fijos (560x315) en el
+           <iframe>; forzamos proporción 16:9 fluida para que no queden
+           recortados ni deformados al encogerse en pantallas estrechas. */
+        .embed-container iframe[src*="youtube"] {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
+        .listen-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.2s;
+            width: 100%;
+        }
+
+        .listen-btn:hover {
+            background: var(--accent-2);
+            transform: translateY(-2px);
+        }
+
+        .listen-btn.listened {
+            background: var(--border);
+            color: var(--text-muted);
+        }
+
+        .listen-btn.listened:hover {
+            background: #625e7f;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            background: var(--border);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #625e7f;
+        }
+
+        .page-btn:disabled {
+            background: var(--surface);
+            color: var(--border);
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+            font-weight: bold;
+        }
+
+        .page-info {
+            padding: 10px 20px;
+            background: var(--surface);
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--warning);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--surface);
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The Quietus</h1>
+            <div class="stats">
+                Total: 90 embeds únicos | Páginas: 12
+            </div>
+        </header>
+
+        <div id="pagination-top" class="pagination"></div>
+        <div id="content"></div>
+        <div id="pagination-bottom" class="pagination"></div>
+
+        <footer>
+            <p>Generado desde FreshRSS (versión corregida)</p>
+        </footer>
+    </div>
+
+    <script>
+        // Datos incrustados directamente en el HTML
+        const allPagesData = {
+  "1": [
+    {
+      "type": "bandcamp",
+      "url": "https://thecramps.bandcamp.com/album/gravest-gravy",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=737232995/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "The Strange World Of… The Cramps",
+      "article_link": "https://thequietus.com/interviews/strange-world-of/the-cramps-best-music/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-06 08:00",
+      "id": "album_737232995"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://johnniefrierson.bandcamp.com/album/have-you-been-good-to-yourself",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3792751256/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_3792751256"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://gabenandez.bandcamp.com/album/pangea-2",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1380642200/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_1380642200"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://moormother.bandcamp.com/album/black-encyclopedia-of-the-air",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3186411584/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_3186411584"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://deerhoof.bandcamp.com/album/breakup-song",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1130316542/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_1130316542"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://emahoytsegemariamgebru.bandcamp.com/album/spielt-eigen-kompositionen",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1646049526/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_1646049526"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://infinityknives666.bandcamp.com/album/in-the-mouth-of-sadness-ugly-nigga-from-heaven",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1835100809/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_1835100809"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://elucid.bandcamp.com/album/valley-of-grace",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=573814559/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_573814559"
+    }
+  ],
+  "2": [
+    {
+      "type": "bandcamp",
+      "url": "https://alexzhanghungtai.bandcamp.com/album/badlands",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4208842434/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_4208842434"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://slausonmalone.bandcamp.com/album/vergangenheitsbew-ltigung-crater-speak",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4181671003/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_4181671003"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://juliannabarwick.bandcamp.com/album/sanguine",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2834883177/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_2834883177"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://pandabearmusic.bandcamp.com/album/young-prayer",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=456060063/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_456060063"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://steeltippeddove.bandcamp.com/album/call-me-when-you-re-outside",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2233686466/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_2233686466"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://grouper.bandcamp.com/album/grid-of-points",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3837097434/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_3837097434"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://futureislands.bandcamp.com/album/wave-like-home",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4124331664/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_4124331664"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://edschradersmusicbeat.bandcamp.com/album/jazz-mind",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=320925930/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_320925930"
+    }
+  ],
+  "3": [
+    {
+      "type": "bandcamp",
+      "url": "https://patrickshiroishi.bandcamp.com/album/hidemi",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2667916590/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_2667916590"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://cool.bandcamp.com/album/to-be-close-to-you",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4014443077/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "album_4014443077"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/qZn_xGCSJVA",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/qZn_xGCSJVA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/6oiKdq8pz90",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/6oiKdq8pz90"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/fngVDIBJVdc",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/fngVDIBJVdc"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/x0--CjlRzNA",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/x0--CjlRzNA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/twT1zz5GMfU",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/twT1zz5GMfU"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/sWaDHzWgSoQ",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/sWaDHzWgSoQ"
+    }
+  ],
+  "4": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/JT0bIqr5Fqc",
+      "title": "Quick Smart: In Praise of the Shortest Albums",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/quick-smart-in-praise-of-the-shortest-albums/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-08-03 09:57",
+      "id": "https://www.youtube.com/embed/JT0bIqr5Fqc"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/ox1Eemj8FDo",
+      "title": "Music of the Month(s): The Best Albums and Tracks of June and July 2026",
+      "article_link": "https://thequietus.com/tq-charts/music-of-the-month/best-new-albums-tracks-june-july-2026/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-31 09:29",
+      "id": "https://www.youtube.com/embed/ox1Eemj8FDo"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/RUkIRiSQtK8",
+      "title": "Music of the Month(s): The Best Albums and Tracks of June and July 2026",
+      "article_link": "https://thequietus.com/tq-charts/music-of-the-month/best-new-albums-tracks-june-july-2026/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-31 09:29",
+      "id": "https://www.youtube.com/embed/RUkIRiSQtK8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/mjq3UA3HxxA",
+      "title": "Music of the Month(s): The Best Albums and Tracks of June and July 2026",
+      "article_link": "https://thequietus.com/tq-charts/music-of-the-month/best-new-albums-tracks-june-july-2026/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-31 09:29",
+      "id": "https://www.youtube.com/embed/mjq3UA3HxxA"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://bornbadrecords.bandcamp.com/album/visions-of-sodal-ye",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3155739182/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Reissue of the Week: Mar-Vista’s Visions Of Sodal Ye",
+      "article_link": "https://thequietus.com/quietus-reviews/reissue-of-the-week/mar-vista-visions-of-sodal-ye-review/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-31 07:30",
+      "id": "album_3155739182"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/IddUJxhDgZk",
+      "title": "Tony Iommi to Release First Solo Album in 21 Years",
+      "article_link": "https://thequietus.com/news/tony-iommi-to-release-first-solo-album-in-21-years/",
+      "author": "Christian Eede",
+      "feed": "The Quietus",
+      "date": "2026-07-29 17:57",
+      "id": "https://www.youtube.com/embed/IddUJxhDgZk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/YtPX_hmUKAo",
+      "title": "Insecure Men Detail New EP, ‘Cream Of England’",
+      "article_link": "https://thequietus.com/news/insecure-men-detail-new-ep-cream-of-england/",
+      "author": "Christian Eede",
+      "feed": "The Quietus",
+      "date": "2026-07-29 13:34",
+      "id": "https://www.youtube.com/embed/YtPX_hmUKAo"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/f2DJPFyhSZs",
+      "title": "The Highs are Higher: An Interview with Curbside Lambsear",
+      "article_link": "https://thequietus.com/interviews/curbside-lambsear-annabelle-modlinger-magdalena-mclean-interview-caroline-the-umlauts/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-29 07:59",
+      "id": "https://www.youtube.com/embed/f2DJPFyhSZs"
+    }
+  ],
+  "5": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/tSSHAq_Q6Fk",
+      "title": "Tyla – A*Pop",
+      "article_link": "https://thequietus.com/quietus-reviews/tyla-apop-review/",
+      "author": "Robert Barry",
+      "feed": "The Quietus",
+      "date": "2026-07-29 05:03",
+      "id": "https://www.youtube.com/embed/tSSHAq_Q6Fk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Zyop_jUNXrY",
+      "title": "Tyla – A*Pop",
+      "article_link": "https://thequietus.com/quietus-reviews/tyla-apop-review/",
+      "author": "Robert Barry",
+      "feed": "The Quietus",
+      "date": "2026-07-29 05:03",
+      "id": "https://www.youtube.com/embed/Zyop_jUNXrY"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/_ZTYgq4EoRo",
+      "title": "A Brief Encounter: In Praise of the Shortest Songs",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/interludes/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-27 09:57",
+      "id": "https://www.youtube.com/embed/_ZTYgq4EoRo"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://arthurrussell.bandcamp.com/track/iowa-dream",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/track=1045752940/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "track_1045752940"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://9-piglet-9.bandcamp.com/track/dans-note",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/track=1575249570/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "track_1575249570"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://michaelhurley.bandcamp.com/track/the-tea-song-2",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/track=4248605521/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "track_4248605521"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/TzqmTmq8YCI",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "https://www.youtube.com/embed/TzqmTmq8YCI"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/jKwXDI-83lI",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "https://www.youtube.com/embed/jKwXDI-83lI"
+    }
+  ],
+  "6": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/iwi0L_Jci3g",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "https://www.youtube.com/embed/iwi0L_Jci3g"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/oCMiCAGwg3k",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "https://www.youtube.com/embed/oCMiCAGwg3k"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/EBg4x0ZqCPw",
+      "title": "Guest Playlist: Nick Granata",
+      "article_link": "https://thequietus.com/subscriber-area/playlists/guest-playlist-nick-granata/",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-21 09:51",
+      "id": "https://www.youtube.com/embed/EBg4x0ZqCPw"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://georgesesioui.bandcamp.com/album/for-all-tomorrows",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=131637141/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "The Remnants of Worship: Michael Cloud Duguay Interviewed",
+      "article_link": "https://thequietus.com/interviews/michael-cloud-duguay-interview/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-20 08:00",
+      "id": "album_131637141"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://michaelcloudduguay.bandcamp.com/album/wobbly-yonder",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1329027024/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "The Remnants of Worship: Michael Cloud Duguay Interviewed",
+      "article_link": "https://thequietus.com/interviews/michael-cloud-duguay-interview/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-20 08:00",
+      "id": "album_1329027024"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://scions.bandcamp.com/album/to-cry-out-in-the-wilderness",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=223954628/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "The Remnants of Worship: Michael Cloud Duguay Interviewed",
+      "article_link": "https://thequietus.com/interviews/michael-cloud-duguay-interview/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-20 08:00",
+      "id": "album_223954628"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://michaelcloudduguay.bandcamp.com/album/kingdom-come-kingdom-go",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=621488082/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "The Remnants of Worship: Michael Cloud Duguay Interviewed",
+      "article_link": "https://thequietus.com/interviews/michael-cloud-duguay-interview/",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-20 08:00",
+      "id": "album_621488082"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/lP13BL6_EIw",
+      "title": "Brian Ennals and Blockhead – Boatshoes",
+      "article_link": "https://thequietus.com/quietus-reviews/brian-ennals-and-blockhead-boatshoes-review/",
+      "author": "Robert Barry",
+      "feed": "The Quietus",
+      "date": "2026-07-17 05:00",
+      "id": "https://www.youtube.com/embed/lP13BL6_EIw"
+    }
+  ],
+  "7": [
+    {
+      "type": "bandcamp",
+      "url": "https://alter.bandcamp.com/track/laughing-at-the-system-1",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/track=3037057228/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Straight Hedge! Noel Gardner Reviews Punk ＆ HC for July",
+      "article_link": "https://thequietus.com/quietus-reviews/punk/best-new-punk-hc-music-july-2026-review-hot-load-love-canal/?utm_source=rss&utm_medium=rss&utm_campaign=best-new-punk-hc-music-july-2026-review-hot-load-love-canal",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-14 07:00",
+      "id": "track_3037057228"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/0eyR2N2ADtU",
+      "title": "Straight Hedge! Noel Gardner Reviews Punk ＆ HC for July",
+      "article_link": "https://thequietus.com/quietus-reviews/punk/best-new-punk-hc-music-july-2026-review-hot-load-love-canal/?utm_source=rss&utm_medium=rss&utm_campaign=best-new-punk-hc-music-july-2026-review-hot-load-love-canal",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-07-14 07:00",
+      "id": "https://www.youtube.com/embed/0eyR2N2ADtU"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/nsyK9_iaCoA",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/nsyK9_iaCoA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/FfjHgPZ7WWA",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/FfjHgPZ7WWA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/5FY1K8ARPZk",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/5FY1K8ARPZk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/r6Pkq2g4cr8",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/r6Pkq2g4cr8"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/_5vKVi0t_jE",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/_5vKVi0t_jE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/21uqLQ2hjBE",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/21uqLQ2hjBE"
+    }
+  ],
+  "8": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/lgCZN1rU5co",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/lgCZN1rU5co"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/eqYpDwjpD1M",
+      "title": "‘Ghost Town’, ‘At The Club’ ＆ Britain’s Summer of Discontent",
+      "article_link": "https://thequietus.com/opinion-and-essays/black-sky-thinking/specials-ghost-town/?utm_source=rss&utm_medium=rss&utm_campaign=specials-ghost-town",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-11 08:00",
+      "id": "https://www.youtube.com/embed/eqYpDwjpD1M"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/eb-bKUxazTk",
+      "title": "Organic Intelligence LVIII: Fluxus on Vinyl",
+      "article_link": "https://thequietus.com/subscriber-area/organic-intelligence/organic-intelligence-lviii-fluxus-on-vinyl/?utm_source=rss&utm_medium=rss&utm_campaign=organic-intelligence-lviii-fluxus-on-vinyl",
+      "author": "Luke Turner",
+      "feed": "The Quietus",
+      "date": "2026-07-10 06:00",
+      "id": "https://www.youtube.com/embed/eb-bKUxazTk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/UG3VcCAlUgE",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/UG3VcCAlUgE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/uTMuqL0qx08",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/uTMuqL0qx08"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/FjredhbTnng",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/FjredhbTnng"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/fdyUqqRfUMk",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/fdyUqqRfUMk"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/b_HPERIjAhU",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/b_HPERIjAhU"
+    }
+  ],
+  "9": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/zkB7S9pVowM",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/zkB7S9pVowM"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/EB_lq1fRqnc",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/EB_lq1fRqnc"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/xik-y0xlpZ0",
+      "title": "Resolved: Aaliyah’s final album 25 years on",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/aaliyah-album-review/?utm_source=rss&utm_medium=rss&utm_campaign=aaliyah-album-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-07 07:05",
+      "id": "https://www.youtube.com/embed/xik-y0xlpZ0"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/iYPsyeb9dtQ",
+      "title": "Independence Day: How Ramones Changed the World",
+      "article_link": "https://thequietus.com/interviews/ramones-1976-punk-london/?utm_source=rss&utm_medium=rss&utm_campaign=ramones-1976-punk-london",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-04 09:03",
+      "id": "https://www.youtube.com/embed/iYPsyeb9dtQ"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://thebugdisfig.bandcamp.com/album/ladybug-1",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=81155577/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "The Bug Launches New LADYBUG Collaborative Series",
+      "article_link": "https://thequietus.com/news/the-bug-launches-new-ladybug-collaborative-series/?utm_source=rss&utm_medium=rss&utm_campaign=the-bug-launches-new-ladybug-collaborative-series",
+      "author": "Christian Eede",
+      "feed": "The Quietus",
+      "date": "2026-07-03 12:51",
+      "id": "album_81155577"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/Wp1NaX_dH0Q",
+      "title": "The Yummy Fur Detail First Album in 27 Years",
+      "article_link": "https://thequietus.com/news/the-yummy-fur-detail-first-album-in-27-years/?utm_source=rss&utm_medium=rss&utm_campaign=the-yummy-fur-detail-first-album-in-27-years",
+      "author": "Christian Eede",
+      "feed": "The Quietus",
+      "date": "2026-07-03 11:27",
+      "id": "https://www.youtube.com/embed/Wp1NaX_dH0Q"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/radJQyaC5kY",
+      "title": "The Price of Integrity: 30 Years of the Stakes is High by De La Soul",
+      "article_link": "https://thequietus.com/opinion-and-essays/anniversary/de-la-soul-stakes-is-dead-review/?utm_source=rss&utm_medium=rss&utm_campaign=de-la-soul-stakes-is-dead-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-07-02 08:23",
+      "id": "https://www.youtube.com/embed/radJQyaC5kY"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://enmossed.bandcamp.com/album/pareidolia",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1490008845/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Unholy Apparitions: Jake Muir Interviewed",
+      "article_link": "https://thequietus.com/interviews/unholy-apparitions-jake-muir-interviewed/?utm_source=rss&utm_medium=rss&utm_campaign=unholy-apparitions-jake-muir-interviewed",
+      "author": "Christian Eede",
+      "feed": "The Quietus",
+      "date": "2026-06-30 18:08",
+      "id": "album_1490008845"
+    }
+  ],
+  "10": [
+    {
+      "type": "bandcamp",
+      "url": "https://orolabel.bandcamp.com/album/unreleased-2011-2019",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=3754523992/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Hyperspecific: Electronic Music for June Reviewed by Jaša Bužinel",
+      "article_link": "https://thequietus.com/quietus-reviews/electronic/electroncic-music-review-techno-ai-lifted-jonas-gruska-el-ponto/?utm_source=rss&utm_medium=rss&utm_campaign=electroncic-music-review-techno-ai-lifted-jonas-gruska-el-ponto",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-06-30 09:39",
+      "id": "album_3754523992"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/tfZNvpWtiI4",
+      "title": "Hyperspecific: Electronic Music for June Reviewed by Jaša Bužinel",
+      "article_link": "https://thequietus.com/quietus-reviews/electronic/electroncic-music-review-techno-ai-lifted-jonas-gruska-el-ponto/?utm_source=rss&utm_medium=rss&utm_campaign=electroncic-music-review-techno-ai-lifted-jonas-gruska-el-ponto",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-06-30 09:39",
+      "id": "https://www.youtube.com/embed/tfZNvpWtiI4"
+    },
+    {
+      "type": "soundcloud",
+      "url": "https://soundcloud.com/lbhonne/angel-after-hours",
+      "title": "Hyperspecific: Electronic Music for June Reviewed by Jaša Bužinel",
+      "article_link": "https://thequietus.com/quietus-reviews/electronic/electroncic-music-review-techno-ai-lifted-jonas-gruska-el-ponto/?utm_source=rss&utm_medium=rss&utm_campaign=electroncic-music-review-techno-ai-lifted-jonas-gruska-el-ponto",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-06-30 09:39",
+      "id": "https://soundcloud.com/lbhonne/angel-after-hours"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://interworldmedia.bandcamp.com/album/dronez",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=2449019791/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "album_2449019791"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/MLpmiywRNzY",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/MLpmiywRNzY"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/BI-aDjb2sAA",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/BI-aDjb2sAA"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/QrVoJgQ7u8w",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/QrVoJgQ7u8w"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/bIPU2ynqy2Y",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/bIPU2ynqy2Y"
+    }
+  ],
+  "11": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/zdtbok37_2M",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/zdtbok37_2M"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/0b75cl4-qRE",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/0b75cl4-qRE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/wSy7Yiiq8jE",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/wSy7Yiiq8jE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/8P0v8ciiifE",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/8P0v8ciiifE"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/IHV5XdUKpgA",
+      "title": "Long Live the New Slop: An Interview with Zaron Mizmeras",
+      "article_link": "https://thequietus.com/culture/art/zaron-mizmeras-interview-2/?utm_source=rss&utm_medium=rss&utm_campaign=zaron-mizmeras-interview-2",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-29 09:51",
+      "id": "https://www.youtube.com/embed/IHV5XdUKpgA"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://heatcrimes.bandcamp.com/album/paradise-metal",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=4087667960/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Rum Music for June Reviewed by Jennifer Lucy Allan",
+      "article_link": "https://thequietus.com/quietus-reviews/rum-music/rum-music-best-finn-loxbo-clara-levy-victor-guaita-igual-michael-f-hunt/?utm_source=rss&utm_medium=rss&utm_campaign=rum-music-best-finn-loxbo-clara-levy-victor-guaita-igual-michael-f-hunt",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-06-26 11:12",
+      "id": "album_4087667960"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://mississippirecords.bandcamp.com/album/the-rats-remastered-2026",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=1432117264/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Rum Music for June Reviewed by Jennifer Lucy Allan",
+      "article_link": "https://thequietus.com/quietus-reviews/rum-music/rum-music-best-finn-loxbo-clara-levy-victor-guaita-igual-michael-f-hunt/?utm_source=rss&utm_medium=rss&utm_campaign=rum-music-best-finn-loxbo-clara-levy-victor-guaita-igual-michael-f-hunt",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-06-26 11:12",
+      "id": "album_1432117264"
+    },
+    {
+      "type": "bandcamp",
+      "url": "https://tashidorji.bandcamp.com/album/byebuyby",
+      "embed_html": "<iframe style=\"border: 0; width: 400px; height: 120px;\" src=\"https://bandcamp.com/EmbeddedPlayer/album=207365078/size=large/bgcol=1f1f28/linkcol=9a64ff/tracklist=false/artwork=small/transparent=true/\" seamless></iframe>",
+      "title": "Rum Music for June Reviewed by Jennifer Lucy Allan",
+      "article_link": "https://thequietus.com/quietus-reviews/rum-music/rum-music-best-finn-loxbo-clara-levy-victor-guaita-igual-michael-f-hunt/?utm_source=rss&utm_medium=rss&utm_campaign=rum-music-best-finn-loxbo-clara-levy-victor-guaita-igual-michael-f-hunt",
+      "author": "Patrick Clarke",
+      "feed": "The Quietus",
+      "date": "2026-06-26 11:12",
+      "id": "album_207365078"
+    }
+  ],
+  "12": [
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/B_ftLFOucNs",
+      "title": "Reissue of the Week: Mash Down Birmingham by Musical Youth",
+      "article_link": "https://thequietus.com/quietus-reviews/reissue-of-the-week/musical-youth-mash-down-birmingham-review/?utm_source=rss&utm_medium=rss&utm_campaign=musical-youth-mash-down-birmingham-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-19 07:52",
+      "id": "https://www.youtube.com/embed/B_ftLFOucNs"
+    },
+    {
+      "type": "youtube",
+      "url": "https://www.youtube.com/embed/tQD4J6a1CEA",
+      "title": "Reissue of the Week: Mash Down Birmingham by Musical Youth",
+      "article_link": "https://thequietus.com/quietus-reviews/reissue-of-the-week/musical-youth-mash-down-birmingham-review/?utm_source=rss&utm_medium=rss&utm_campaign=musical-youth-mash-down-birmingham-review",
+      "author": "John Doran",
+      "feed": "The Quietus",
+      "date": "2026-06-19 07:52",
+      "id": "https://www.youtube.com/embed/tQD4J6a1CEA"
+    }
+  ]
+};
+        const totalPages = 12;
+        const maxPagesButtons = 15;
+        const feedName = 'The_Quietus';
+        const storageKey = `freshrss_listened_${feedName}`;
+
+        let currentPage = 1;
+        let listenedItems = new Set();
+
+        // Cargar items escuchados desde localStorage
+        function loadListenedItems() {
+            try {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) {
+                    listenedItems = new Set(JSON.parse(stored));
+                    console.log(`Loaded ${listenedItems.size} listened items for ${feedName}`);
+                }
+            } catch (error) {
+                console.error('Error loading listened items:', error);
+            }
+        }
+
+        // Guardar items escuchados en localStorage
+        function saveListenedItems() {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(Array.from(listenedItems)));
+                console.log(`Saved ${listenedItems.size} listened items for ${feedName}`);
+            } catch (error) {
+                console.error('Error saving listened items:', error);
+            }
+        }
+
+        // Marcar/desmarcar item como escuchado. Solo "marcar" se persiste en
+        // el servidor (SQLite, vía /api/listened) — el servidor no soporta
+        // desmarcar, así que "desmarcar" aquí es solo visual/local hasta la
+        // próxima regeneración.
+        function toggleListened(itemId) {
+            if (listenedItems.has(itemId)) {
+                listenedItems.delete(itemId);
+            } else {
+                listenedItems.add(itemId);
+                fetch('/api/listened', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: itemId}),
+                }).catch(err => console.error('No se pudo guardar en el servidor:', err));
+            }
+            saveListenedItems();
+            loadPage(currentPage);
+        }
+
+        function generateBandcampEmbed(item) {
+            if (item.embed_html) {
+                return item.embed_html;
+            }
+            return `<p>URL de Bandcamp: <a href="${item.url}" target="_blank">${item.url}</a></p>`;
+        }
+
+        function generateYoutubeEmbed(url) {
+            const embedUrl = url.includes('?') ? url : `${url}`;
+            return `<iframe width="560" height="315" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        }
+
+        function generateSoundcloudEmbed(url) {
+            const encodedUrl = encodeURIComponent(url);
+            const embedUrl = `https://w.soundcloud.com/player/?url=${encodedUrl}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`;
+            return `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="${embedUrl}"></iframe>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateEmbedHTML(item) {
+            const typeIcons = {
+                'bandcamp': '🎵',
+                'youtube': '📺',
+                'soundcloud': '🔊'
+            };
+
+            const typeNames = {
+                'bandcamp': 'Bandcamp',
+                'youtube': 'YouTube',
+                'soundcloud': 'SoundCloud'
+            };
+
+            let embedCode = '';
+            if (item.type === 'bandcamp') {
+                embedCode = generateBandcampEmbed(item);
+            } else if (item.type === 'youtube') {
+                embedCode = generateYoutubeEmbed(item.url);
+            } else if (item.type === 'soundcloud') {
+                embedCode = generateSoundcloudEmbed(item.url);
+            }
+
+            const isListened = listenedItems.has(item.id);
+            const listenedClass = isListened ? 'listened' : '';
+            const btnText = isListened ? '✓ Escuchado' : 'Marcar como escuchado';
+            const btnClass = isListened ? 'listened' : '';
+
+            return `
+                <div class="embed-item ${listenedClass}" data-id="${escapeHtml(item.id)}">
+                    <div class="embed-info">
+                        <div class="embed-type">${typeIcons[item.type]} ${typeNames[item.type]}</div>
+                        <h3>${escapeHtml(item.title)}</h3>
+                        <p class="meta">
+                            📅 ${item.date}
+                            ${item.author ? ` | 👤 ${escapeHtml(item.author)}` : ''}
+                            ${item.feed ? ` | 📡 ${escapeHtml(item.feed)}` : ''}
+                        </p>
+                        <p><a href="${escapeHtml(item.article_link)}" target="_blank">Ver artículo original →</a></p>
+                    </div>
+                    <div class="embed-container">
+                        ${embedCode}
+                    </div>
+                    <button class="listen-btn ${btnClass}" onclick="toggleListened('${escapeHtml(item.id)}')">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+        }
+
+        function loadPage(pageNum) {
+            if (pageNum < 1 || pageNum > totalPages) return;
+
+            const content = document.getElementById('content');
+            const pageData = allPagesData[String(pageNum)];
+
+            if (!pageData) {
+                content.innerHTML = '<div class="loading">Página no encontrada</div>';
+                return;
+            }
+
+            let html = '<div class="embeds-grid">';
+            for (const item of pageData) {
+                html += generateEmbedHTML(item);
+            }
+            html += '</div>';
+
+            content.innerHTML = html;
+            currentPage = pageNum;
+            renderPagination();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderPagination() {
+            const paginationHTML = createPaginationButtons();
+            document.getElementById('pagination-top').innerHTML = paginationHTML;
+            document.getElementById('pagination-bottom').innerHTML = paginationHTML;
+        }
+
+        function createPaginationButtons() {
+            let html = '';
+
+            if (currentPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage - 1})">← Anterior</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>← Anterior</button>`;
+            }
+
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesButtons - 1);
+
+            if (endPage - startPage < maxPagesButtons - 1) {
+                startPage = Math.max(1, endPage - maxPagesButtons + 1);
+            }
+
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    html += `<span class="page-info">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    html += `<button class="page-btn active">${i}</button>`;
+                } else {
+                    html += `<button class="page-btn" onclick="changePage(${i})">${i}</button>`;
+                }
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span class="page-info">...</span>`;
+                }
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            if (currentPage < totalPages) {
+                html += `<button class="page-btn" onclick="changePage(${currentPage + 1})")>Siguiente →</button>`;
+            } else {
+                html += `<button class="page-btn" disabled>Siguiente →</button>`;
+            }
+
+            return html;
+        }
+
+        function changePage(pageNum) {
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                loadPage(pageNum);
+            }
+        }
+
+        loadListenedItems();
+        console.log('Datos cargados:', Object.keys(allPagesData).length, 'páginas');
+        loadPage(1);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changePage(currentPage - 1);
+            } else if (e.key === 'ArrowRight') {
+                changePage(currentPage + 1);
+            }
+        });
+    </script>
+    <script src="theme-picker.js"></script>
+    <script src="settings-panel.js"></script>
+</body>
+</html>
