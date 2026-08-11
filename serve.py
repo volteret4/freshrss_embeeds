@@ -222,12 +222,22 @@ def api_listened():
     if not item_id:
         return jsonify({"ok": False, "error": "id requerido"}), 400
     freshrss_db.mark_listened(item_id)
-    # No hay JSON intermedio como en bandcamp — freshrss regenera re-fetcheando
-    # de FreshRSS, así que reutilizamos el mismo flujo (en background) que
-    # /api/update. El filtro de listened ya se aplica en freshrss_html_generator.py.
-    if not _status["running"]:
-        threading.Thread(target=_do_update, daemon=True).start()
-    return jsonify({"ok": True, "regenerating": True})
+    # Regenera solo desde lo que ya hay en docs/ (freshrss_regen_local.py),
+    # sin tocar la red -- antes esto reusaba el mismo flujo que /api/update
+    # (refetch completo de todos los feeds contra FreshRSS), que puede
+    # tardar varios minutos solo para ocultar un ítem ya descargado. Se
+    # ejecuta síncrono (no en background) porque sin red es cuestión de
+    # segundos, así que la respuesta ya refleja el estado final real.
+    try:
+        result = subprocess.run(
+            [str(VENV_PYTHON), "freshrss_regen_local.py", "--output-dir", "docs"],
+            cwd=str(BASE_DIR), capture_output=True, text=True, timeout=60,
+        )
+        if result.returncode != 0:
+            return jsonify({"ok": True, "warning": f"marcado, pero falló la regeneración local: {result.stderr}"})
+    except Exception as e:
+        return jsonify({"ok": True, "warning": f"marcado, pero falló la regeneración local: {e}"})
+    return jsonify({"ok": True})
 
 
 if __name__ == "__main__":
