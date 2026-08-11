@@ -109,6 +109,10 @@ def generate_index_html(feeds, output_dir):
     Genera el archivo index.html con todos los feeds.
     Tema oscuro con color de fondo #1f1f28
     """
+    # Feeds sin pendientes (todo marcado como escuchado) no tienen sentido
+    # en el índice con "0 Total" -- se quedaban ahí mostrándose para siempre.
+    feeds = [f for f in feeds if f['total_embeds'] > 0]
+
     total_embeds = sum(f['total_embeds'] for f in feeds)
     total_bandcamp = sum(f['bandcamp'] for f in feeds)
     total_youtube = sum(f['youtube'] for f in feeds)
