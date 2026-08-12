@@ -4,7 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Depósito Sonoro - Embeds</title>
+    <link rel="stylesheet" href="theme-palettes.css">
     <style>
+        [data-theme="og"], :root:not([data-theme]) {
+            --bg: #1f1f28;
+            --surface: #2a2a37;
+            --surface-2: #16161d;
+            --border: #54546d;
+            --text: #dcd7ba;
+            --text-muted: #938aa9;
+            --accent: #7e9cd8;
+            --accent-2: #957fb8;
+            --success: #76946a;
+            --warning: #c8c093;
+            --danger: #e46876;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +28,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1f1f28;
+            background: var(--bg);
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,14 +44,14 @@
         }
 
         h1 {
-            color: #dcd7ba;
+            color: var(--text);
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .stats {
-            color: #c8c093;
+            color: var(--warning);
             font-size: 1.1em;
         }
 
@@ -48,17 +63,90 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
             .embeds-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            header {
+                margin-bottom: 24px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                overflow-wrap: break-word;
+            }
+
+            .embed-item {
+                padding: 16px;
+            }
+
+            .pagination {
+                gap: 8px;
+                margin: 24px 0;
+            }
+
+            .page-btn,
+            .listen-btn {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-info {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            .stats {
+                font-size: 1em;
+            }
+
+            .embed-item {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .embed-info h3 {
+                font-size: 1em;
+            }
+
+            .page-btn {
+                padding: 10px 14px;
+                font-size: 0.95em;
+            }
+
+            .pagination {
+                gap: 6px;
             }
         }
 
         .embed-item {
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+            /* Sin esto, un grid item no encoge por debajo del ancho de su
+               contenido (min-width: auto por defecto) y un título largo sin
+               espacios fuerza scroll horizontal en pantallas estrechas. */
+            min-width: 0;
         }
 
         .embed-item:hover {
@@ -68,7 +156,7 @@
 
         .embed-item.listened {
             opacity: 0.4;
-            background: #1a1a22;
+            background: var(--surface-2);
         }
 
         .embed-item.listened:hover {
@@ -87,26 +175,28 @@
 
         .embed-info h3 {
             font-size: 1.1em;
-            color: #dcd7ba;
+            color: var(--text);
             margin-bottom: 10px;
             line-height: 1.4;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .embed-info .meta {
             font-size: 0.9em;
-            color: #938aa9;
+            color: var(--text-muted);
             margin-bottom: 8px;
         }
 
         .embed-info a {
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
             font-size: 0.9em;
         }
 
         .embed-info a:hover {
             text-decoration: underline;
-            color: #957fb8;
+            color: var(--accent-2);
         }
 
         .embed-container {
@@ -120,11 +210,20 @@
             max-width: 100%;
         }
 
+        /* Los embeds de YouTube traen width/height fijos (560x315) en el
+           <iframe>; forzamos proporción 16:9 fluida para que no queden
+           recortados ni deformados al encogerse en pantallas estrechas. */
+        .embed-container iframe[src*="youtube"] {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+        }
+
         .listen-btn {
             margin-top: 15px;
             padding: 10px 20px;
-            background: #7e9cd8;
-            color: #1f1f28;
+            background: var(--accent);
+            color: var(--bg);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -135,13 +234,13 @@
         }
 
         .listen-btn:hover {
-            background: #957fb8;
+            background: var(--accent-2);
             transform: translateY(-2px);
         }
 
         .listen-btn.listened {
-            background: #54546d;
-            color: #938aa9;
+            background: var(--border);
+            color: var(--text-muted);
         }
 
         .listen-btn.listened:hover {
@@ -159,8 +258,8 @@
 
         .page-btn {
             padding: 10px 20px;
-            background: #54546d;
-            color: #dcd7ba;
+            background: var(--border);
+            color: var(--text);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -173,30 +272,30 @@
         }
 
         .page-btn:disabled {
-            background: #2a2a37;
-            color: #54546d;
+            background: var(--surface);
+            color: var(--border);
             cursor: not-allowed;
         }
 
         .page-btn.active {
-            background: #7e9cd8;
-            color: #1f1f28;
+            background: var(--accent);
+            color: var(--bg);
             font-weight: bold;
         }
 
         .page-info {
             padding: 10px 20px;
-            background: #2a2a37;
+            background: var(--surface);
             border-radius: 8px;
             font-weight: 600;
-            color: #c8c093;
+            color: var(--warning);
         }
 
         .loading {
             text-align: center;
             padding: 40px;
             font-size: 1.2em;
-            color: #938aa9;
+            color: var(--text-muted);
         }
 
         .loading::after {
@@ -214,12 +313,12 @@
             text-align: center;
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 2px solid #2a2a37;
-            color: #938aa9;
+            border-top: 2px solid var(--surface);
+            color: var(--text-muted);
         }
 
         footer a {
-            color: #7e9cd8;
+            color: var(--accent);
             text-decoration: none;
         }
 
@@ -294,12 +393,20 @@
             }
         }
 
-        // Marcar/desmarcar item como escuchado
+        // Marcar/desmarcar item como escuchado. Solo "marcar" se persiste en
+        // el servidor (SQLite, vía /api/listened) — el servidor no soporta
+        // desmarcar, así que "desmarcar" aquí es solo visual/local hasta la
+        // próxima regeneración.
         function toggleListened(itemId) {
             if (listenedItems.has(itemId)) {
                 listenedItems.delete(itemId);
             } else {
                 listenedItems.add(itemId);
+                fetch('/api/listened', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: itemId}),
+                }).catch(err => console.error('No se pudo guardar en el servidor:', err));
             }
             saveListenedItems();
             loadPage(currentPage);
@@ -473,5 +580,7 @@
             }
         });
     </script>
+    <script src="theme-picker.js"></script>
+    <script src="settings-panel.js"></script>
 </body>
 </html>
