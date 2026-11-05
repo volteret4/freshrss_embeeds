@@ -1,8 +1,50 @@
-# FreshRSS Embed Generator
+# FreshRSS Embeds
+
+Saca los enlaces de Bandcamp, YouTube y SoundCloud de tus feeds de FreshRSS y crea una página de reproductores por feed o categoría.
+
+## Para qué sirve
+
+Muchos blogs de música enlazan más de lo que se llega a leer. Esto te deja escuchar todo lo enlazado sin abrir artículo por artículo.
+
+[Versión pública de prueba](https://volteret4.github.io/freshrss_embeeds/).
+
+## Instalación individual
+
+Necesitas Docker y un servidor FreshRSS con la API de Google Reader activada.
+
+```bash
+git clone https://github.com/volteret4/freshrss_embeeds.git
+```
+
+```bash
+cd freshrss_embeeds && cp .env.example .env
+```
+
+Edita `.env` con tu servidor y tus feeds, y arranca:
+
+```bash
+docker build -t freshrss-embeds .
+```
+
+```bash
+docker run -d --name freshrss-embeds --restart unless-stopped --user "$(id -u):$(id -g)" --env-file .env -v "$PWD:/app" -p 8766:8765 freshrss-embeds
+```
+
+Se abre en <http://localhost:8766>. Para procesar los feeds por primera vez:
+
+```bash
+curl -X POST http://localhost:8766/api/update
+```
+
+## Instalación desde REPEAT-ONE
+
+Este módulo forma parte de [REPEAT-ONE](https://volteret4.github.io/repeat-one-web/), que permite elegir qué módulos instalar: [ver la instalación](https://github.com/volteret4/repeat-one-web#instalación). Allí se llama `freshrss`.
+
+## Documentación detallada
 
 Script para extraer enlaces de **Bandcamp**, **YouTube** y **SoundCloud** desde feeds de FreshRSS y generar páginas HTML con los embeds correspondientes.
 
-## Características
+### Características
 
 - Extrae enlaces de Bandcamp, YouTube y SoundCloud
 - Se conecta a FreshRSS mediante la API de Google Reader
@@ -15,30 +57,30 @@ Script para extraer enlaces de **Bandcamp**, **YouTube** y **SoundCloud** desde 
 
 ---
 
-## Despliegue como servidor web
+### Despliegue como servidor web
 
 Esta sección cubre cómo exponer el sitio con SSL usando SWAG (Docker) y actualizaciones automáticas semanales.
 
-### Requisitos
+#### Requisitos
 
 - Python virtualenv en `~/Scripts/python_venv` con Flask instalado
 - SWAG corriendo en Docker con tus certificados SSL
 - systemd disponible en el servidor
 
-### 1. Clonar el repositorio
+#### 1. Clonar el repositorio
 
 ```bash
 git clone <url-del-repo> ~/gits/freshrss_embeeds
 cd ~/gits/freshrss_embeeds
 ```
 
-### 2. Instalar dependencias en el virtualenv
+#### 2. Instalar dependencias en el virtualenv
 
 ```bash
 ~/Scripts/python_venv/bin/pip install flask requests
 ```
 
-### 3. Crear el archivo de credenciales
+#### 3. Crear el archivo de credenciales
 
 ```bash
 cp .env.example .env
@@ -57,7 +99,7 @@ PORT=8765
 
 El archivo `.env` está en `.gitignore` y nunca se sube al repositorio.
 
-### 4. Generar el sitio por primera vez
+#### 4. Generar el sitio por primera vez
 
 ```bash
 cd ~/gits/freshrss_embeeds
@@ -76,7 +118,7 @@ cd ~/gits/freshrss_embeeds
 
 Esto genera los HTML en `docs/` incluyendo el botón de actualización manual.
 
-### 5. Instalar el servicio systemd
+#### 5. Instalar el servicio systemd
 
 ```bash
 sudo cp freshrss-embeeds.service /etc/systemd/system/
@@ -93,7 +135,7 @@ journalctl -u freshrss-embeeds -f
 
 El servidor queda escuchando en `http://0.0.0.0:8765` y se reinicia solo si falla.
 
-### 6. Configurar SWAG
+#### 6. Configurar SWAG
 
 Edita `nginx-freshrss-embeeds.conf` y cambia la IP del servidor:
 
@@ -119,7 +161,7 @@ El archivo incluye dos opciones comentadas:
 - **Opción A** (activa): subdominio `embeds.tudominio.com`
 - **Opción B** (comentada): subfolder `tudominio.com/embeds/`
 
-### Botón de actualización manual
+#### Botón de actualización manual
 
 El `index.html` generado incluye un botón flotante en la esquina inferior derecha. Al pulsarlo:
 
@@ -128,7 +170,7 @@ El `index.html` generado incluye un botón flotante en la esquina inferior derec
 3. Al terminar recarga la página automáticamente
 4. Muestra un mensaje de error si algo falla
 
-### Actualización automática
+#### Actualización automática
 
 El servidor actualiza el contenido automáticamente cada 7 días (configurable con `UPDATE_INTERVAL_DAYS` en `.env`). No es necesario ningún cron job externo.
 
@@ -140,15 +182,15 @@ curl http://localhost:8765/api/status
 
 ---
 
-## Uso de los scripts por separado
+### Uso de los scripts por separado
 
-### Requisitos (sin servidor)
+#### Requisitos (sin servidor)
 
 ```bash
 pip install requests
 ```
 
-### Generador de feeds
+#### Generador de feeds
 
 ```bash
 # Listar feeds disponibles
@@ -166,7 +208,7 @@ python freshrss_html_generator.py \
   --output-dir docs
 ```
 
-### Generador de índice
+#### Generador de índice
 
 ```bash
 python freshrss_html_index.py --input-dir docs
@@ -174,7 +216,7 @@ python freshrss_html_index.py --input-dir docs
 
 Genera `docs/index.html` con estadísticas globales, buscador y tarjetas navegables para cada feed.
 
-### Opciones del generador
+#### Opciones del generador
 
 | Opción | Descripción |
 |---|---|
@@ -192,7 +234,7 @@ Genera `docs/index.html` con estadísticas globales, buscador y tarjetas navegab
 
 ---
 
-## Servicios soportados
+### Servicios soportados
 
 **Bandcamp** — detecta URLs de álbumes y tracks, genera embeds interactivos.
 
@@ -202,7 +244,7 @@ Genera `docs/index.html` con estadísticas globales, buscador y tarjetas navegab
 
 ---
 
-## Estructura del directorio
+### Estructura del directorio
 
 ```
 freshrss_embeeds/
@@ -221,7 +263,7 @@ freshrss_embeeds/
 
 ---
 
-## Solución de problemas
+### Solución de problemas
 
 **El servicio no arranca:**
 ```bash
@@ -244,6 +286,6 @@ Comprueba que `.env` existe y que `FRESHRSS_PASS` está configurado.
 
 ---
 
-## Licencia
+### Licencia
 
 Script de uso libre. Úsalo y modifícalo como necesites.
