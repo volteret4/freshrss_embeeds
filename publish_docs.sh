@@ -39,7 +39,19 @@ fi
 REMOTE_HEAD="$(git rev-parse FETCH_HEAD)"
 LOCAL_HEAD="$(git rev-parse HEAD)"
 
-if [ "$REMOTE_HEAD" != "$LOCAL_HEAD" ]; then
+# Commits de docs/ de ejecuciones anteriores cuyo push falló (p. ej. GH_PAT
+# caducado). No son "desarrollo sin publicar": se suben en esta ejecución.
+# Sin esto, un solo push fallido bloqueaba todas las ejecuciones siguientes
+# (HEAD local ≠ main) aunque se renovara el token.
+solo_docs_del_bot() {
+    git merge-base --is-ancestor "$REMOTE_HEAD" HEAD &&
+    [ -z "$(git log --format=%an "$REMOTE_HEAD"..HEAD | grep -vx tumtumpa-bot)" ] &&
+    git diff --quiet "$REMOTE_HEAD" HEAD -- . ':(exclude)docs'
+}
+
+if [ "$REMOTE_HEAD" != "$LOCAL_HEAD" ] && solo_docs_del_bot; then
+    echo "Hay commits de docs/ de ejecuciones anteriores sin subir; se suben ahora."
+elif [ "$REMOTE_HEAD" != "$LOCAL_HEAD" ]; then
     echo "⚠ El HEAD local no coincide con main en GitHub — hay commits sin"
     echo "  publicar de antes (desarrollo normal del repo) que no queremos"
     echo "  subir de golpe junto con docs/. Publícalos a mano primero:"
@@ -50,13 +62,22 @@ fi
 
 git add docs
 if git diff --cached --quiet; then
-    echo "docs/ sin cambios, nada que publicar."
-    exit 0
+    if [ "$REMOTE_HEAD" = "$LOCAL_HEAD" ]; then
+        echo "docs/ sin cambios, nada que publicar."
+        exit 0
+    fi
+else
+    git -c user.email="tumtumpa-bot@localhost" -c user.name="tumtumpa-bot" \
+        commit -m "auto: actualiza docs $(date -u +%F)"
 fi
 
-git -c user.email="tumtumpa-bot@localhost" -c user.name="tumtumpa-bot" \
-    commit -m "auto: actualiza docs $(date -u +%F)"
-
-git push "$REMOTE_URL" HEAD:main
+if ! git push "$REMOTE_URL" HEAD:main; then
+    # Deshace los commits del bot (los cambios de docs/ quedan en el árbol)
+    # para que la próxima ejecución parta otra vez de main y no se atasque.
+    git reset --soft "$REMOTE_HEAD"
+    echo "❌ Falló el push (¿GH_PAT caducado o sin contents:write?). docs/ queda"
+    echo "   pendiente; se reintentará en la próxima ejecución."
+    exit 1
+fi
 
 echo "docs/ publicado en GitHub Pages."
