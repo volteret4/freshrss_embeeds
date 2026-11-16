@@ -696,11 +696,17 @@ def generate_index_html(feeds, output_dir):
                 }});
         }}
 
-        // Comprobar si hay actualizacion en curso al cargar
-        fetch('/api/status')
-            .then(r => r.json())
-            .then(s => {{ if (s.running) {{ setUpdating(true); pollStatus(); }} }})
-            .catch(() => {{}});
+        // En GitHub Pages no hay servidor: fuera el botón y las herramientas de sincronización.
+        if (location.hostname.endsWith('github.io')) {{
+            document.getElementById('update-btn').remove();
+            document.querySelector('.tools-link')?.remove();
+        }} else {{
+            // Comprobar si hay actualizacion en curso al cargar
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(s => {{ if (s.running) {{ setUpdating(true); pollStatus(); }} }})
+                .catch(() => {{}});
+        }}
 
         function filterFeeds() {{
             const searchTerm = document.getElementById('search').value.toLowerCase();
