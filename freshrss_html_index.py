@@ -566,6 +566,7 @@ def generate_index_html(feeds, output_dir):
             }}
         }}
     </style>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="5d84fd6c-0760-4a0c-a2d0-ffabb82179f5"></script>
 </head>
 <body>
     <div class="container">
