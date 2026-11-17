@@ -1,0 +1,37 @@
+# Instalación por separado. Dentro de REPEAT-ONE se usa el docker-compose.yml de REPEAT-ONE.
+services:
+  freshrss:
+    build: .
+    restart: unless-stopped
+    user: "${UID_GID:-1000:1000}"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - HOME=/tmp
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - .:/app
+    ports:
+      - "${PUERTO:-8766}:8765"
+    labels:
+      ofelia.enabled: "true"
+      repeat-one.ofelia: "freshrss_embeeds"
+      ofelia.job-exec.freshrss-update.schedule: "0 15 6 * * *"
+      ofelia.job-exec.freshrss-update.command: "curl -X POST http://localhost:8765/api/update"
+      ofelia.job-exec.freshrss-publish.schedule: "0 30 6 * * *"
+      ofelia.job-exec.freshrss-publish.command: "nice -n 19 ionice -c 3 bash publish_docs.sh"
+
+  # Ofelia lanza los trabajos programados de las etiquetas ofelia.job-exec.* de arriba
+  # (los mismos horarios que en REPEAT-ONE). Solo ve los contenedores de este repo.
+  # Si no quieres actualizaciones automáticas: docker compose stop ofelia
+  ofelia:
+    image: mcuadros/ofelia:latest
+    restart: unless-stopped
+    command: daemon --docker --docker-filter=label=repeat-one.ofelia=freshrss_embeeds
+    environment:
+      - TZ=${TZ:-Europe/Madrid}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - freshrss

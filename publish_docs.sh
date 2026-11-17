@@ -29,7 +29,8 @@ if [ -z "${GH_PAT:-}" ]; then
     exit 0
 fi
 
-REMOTE_URL="https://x-access-token:${GH_PAT}@github.com/volteret4/freshrss_embeeds.git"
+# Repo de GitHub donde se publica docs/ (usuario/repo); por defecto, el original
+REMOTE_URL="https://x-access-token:${GH_PAT}@github.com/${PUBLISH_REPO:-volteret4/freshrss_embeeds}.git"
 
 if ! git fetch --quiet "$REMOTE_URL" main; then
     echo "❌ No se pudo contactar GitHub (revisa GH_PAT / conectividad)."
